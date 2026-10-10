@@ -4,6 +4,19 @@
 
 Little Moon predicts your cycle from what you log yourself and keeps everything on your own phone. No account, no server, no ads, and nothing is ever sent anywhere. It is free and will stay free.
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/home.jpg" width="230" alt="Home">
+  <img src="docs/screenshots/calendar.jpg" width="230" alt="Calendar">
+  <img src="docs/screenshots/insights.jpg" width="230" alt="Cycle insights">
+</p>
+<p align="center">
+  <img src="docs/screenshots/health.jpg" width="230" alt="Health">
+  <img src="docs/screenshots/profile.jpg" width="230" alt="Profile">
+  <img src="docs/screenshots/settings.jpg" width="230" alt="Settings">
+</p>
+
 ## Features
 
 - **Cycle predictions** — next period, ovulation day and fertile window, estimated from the average of your recent logged cycles
