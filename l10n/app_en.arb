@@ -1,0 +1,355 @@
+{
+  "@@locale": "en",
+  "homeGreeting": "Good evening",
+  "dayOfCycle": "Day {day}",
+  "@dayOfCycle": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "ofYourCycle": "of your cycle",
+  "follicularPhase": "Follicular Phase",
+  "lutealPhase": "Luteal Phase",
+  "menstrualPhase": "Menstrual Phase",
+  "ovulationPhase": "Ovulation Phase",
+  "daysUntilPeriod": "{days} days until next period",
+  "@daysUntilPeriod": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "cycleHealthy": "Your cycle is currently within your usual range.",
+  "dailyCheckIn": "Daily check-in",
+  "howAreYouFeeling": "How are you feeling today?",
+  "flow": "Flow",
+  "mood": "Mood",
+  "pain": "Pain",
+  "energy": "Energy",
+  "sleep": "Sleep",
+  "symptoms": "Symptoms",
+  "todaysSummary": "Today's Summary",
+  "logToday": "Log\ntoday",
+  "good": "Good",
+  "medium": "Medium",
+  "mild": "Mild",
+  "yourCycleInsights": "Your cycle insights",
+  "averageCycle": "Average cycle",
+  "recentPattern": "Recent pattern",
+  "days": "days",
+  "home": "Home",
+  "calendar": "Calendar",
+  "insights": "Insights",
+  "health": "Health",
+  "profile": "Profile",
+  "month": "Month",
+  "@month": {
+    "description": "Toggle label for monthly calendar view"
+  },
+  "week": "Week",
+  "@week": {
+    "description": "Toggle label for weekly calendar view"
+  },
+  "period": "Period",
+  "@period": {
+    "description": "Legend/status label for a period day"
+  },
+  "fertile": "Fertile",
+  "@fertile": {
+    "description": "Legend label for the fertile window"
+  },
+  "ovulation": "Ovulation",
+  "@ovulation": {
+    "description": "Legend label for ovulation day"
+  },
+  "periodDay": "Period day",
+  "@periodDay": {
+    "description": "Status text shown when the selected day is a period day"
+  },
+  "fertileWindow": "Fertile window",
+  "@fertileWindow": {
+    "description": "Status text shown when the selected day is in the fertile window"
+  },
+  "ovulationDay": "Ovulation day",
+  "@ovulationDay": {
+    "description": "Status text shown when the selected day is the ovulation day"
+  },
+  "noDataLogged": "No data logged",
+  "@noDataLogged": {
+    "description": "Status text shown when there is no data for the selected day"
+  },
+  "logButton": "Log",
+  "@logButton": {
+    "description": "Short button label to log data for a day"
+  },
+  "save": "Save",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+  "clear": "Clear",
+  "ok": "Got it",
+  "back": "Back",
+  "next": "Next",
+  "undo": "Undo",
+  "today": "Today",
+  "notSet": "Not set",
+  "notEnoughData": "Not enough data",
+  "invalidValue": "That value does not look right.",
+  "goodMorning": "Good morning",
+  "goodAfternoon": "Good afternoon",
+  "goodNight": "Good night",
+  "periodDayNumber": "Day {day} of your period",
+  "@periodDayNumber": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "periodLateBy": "Period is {days} days late",
+  "@periodLateBy": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "periodLateOneDay": "Period is 1 day late",
+  "periodExpectedToday": "Your period is expected today",
+  "periodExpectedTomorrow": "Your period is expected tomorrow",
+  "cycleLateNote": "Your period is more than a week late. If this continues, consider a pregnancy test or talking to a doctor.",
+  "cycleIrregularNote": "Your recent cycles vary in length, so predictions are less precise.",
+  "periodStartedToday": "My period started today",
+  "periodContinuesToday": "I still have my period today",
+  "periodLoggedToday": "Period logged for today",
+  "noCycleDataTitle": "No period logged yet",
+  "noCycleDataBody": "Log the first day of your last period so Little Moon can start predicting your cycle.",
+  "logLastPeriod": "Log my last period",
+  "predictionInfoTitle": "How is this calculated?",
+  "predictionInfoBody": "Your next period is estimated from the average length of your recent logged cycles. Ovulation is estimated about 14 days before the next period, and the fertile window runs from 5 days before ovulation to 1 day after.\n\nThe more periods you log, the more accurate this gets. These are estimates — do not use them as contraception.",
+  "reminders": "Reminders",
+  "noReminders": "Nothing to remind you of today.",
+  "reminderPeriodSoon": "Your period is expected in {days} days.",
+  "@reminderPeriodSoon": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "reminderPeriodTomorrow": "Your period is expected tomorrow.",
+  "reminderPeriodToday": "Your period is expected today.",
+  "reminderFertileSoon": "Your fertile window starts tomorrow.",
+  "reminderFertileToday": "You are in your fertile window.",
+  "reminderOvulationToday": "Today is your estimated ovulation day.",
+  "reminderLogToday": "You have not logged anything today.",
+  "remindersHint": "You get a phone notification at 9:00 for cycle reminders and at 21:00 for the daily log. They also appear on the home screen bell.",
+  "reminderPeriodSetting": "Upcoming period",
+  "reminderDaysBefore": "Remind me before",
+  "reminderFertileSetting": "Fertile window",
+  "reminderOvulationSetting": "Ovulation day",
+  "reminderLogSetting": "Daily log",
+  "futureDayNotAllowed": "You can only log today or past days.",
+  "flowNone": "None",
+  "flowSpotting": "Spotting",
+  "flowLight": "Light",
+  "flowMedium": "Medium",
+  "flowHeavy": "Heavy",
+  "moodHappy": "Happy",
+  "moodCalm": "Calm",
+  "moodSensitive": "Sensitive",
+  "moodSad": "Sad",
+  "moodIrritable": "Irritable",
+  "moodAnxious": "Anxious",
+  "painNone": "No pain",
+  "painSevere": "Severe",
+  "energyLow": "Low",
+  "energyHigh": "High",
+  "symptomCramps": "Cramps",
+  "symptomHeadache": "Headache",
+  "symptomBackPain": "Back pain",
+  "symptomBloating": "Bloating",
+  "symptomBreastTenderness": "Breast tenderness",
+  "symptomAcne": "Acne",
+  "symptomNausea": "Nausea",
+  "symptomFatigue": "Fatigue",
+  "symptomCravings": "Cravings",
+  "symptomInsomnia": "Insomnia",
+  "symptomDizziness": "Dizziness",
+  "symptomDischarge": "Discharge",
+  "note": "Note",
+  "noteHint": "Anything you want to remember about today…",
+  "sleepHours": "{hours}h",
+  "@sleepHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "sleepHoursMinutes": "{hours}h {minutes}m",
+  "@sleepHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "predicted": "Predicted",
+  "predictedPeriodDay": "Predicted period",
+  "cycleDayShort": "Cycle day {day}",
+  "@cycleDayShort": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "dataLogged": "Logged",
+  "insightsEmpty": "Once you log your first period, your cycle statistics and predictions will show up here.",
+  "averagePeriod": "Average period",
+  "regularity": "Regularity",
+  "regular": "Regular",
+  "irregular": "Irregular",
+  "cyclesTracked": "Cycles tracked",
+  "predictions": "Predictions",
+  "nextPeriod": "Next period",
+  "followingPeriod": "Following period",
+  "cycleHistory": "Cycle history",
+  "historyEmpty": "Your cycle lengths will appear here after you log at least two periods.",
+  "topSymptoms": "Most frequent symptoms",
+  "last90Days": "Last 90 days",
+  "noSymptomsLogged": "No symptoms logged yet.",
+  "moodSummary": "Mood",
+  "noMoodLogged": "No mood logged yet.",
+  "medicalDisclaimer": "Predictions are estimates based on what you log. They are not medical advice and should not be used as contraception.",
+  "yourBody": "Your body",
+  "tipsForYou": "Tips for this phase",
+  "todayTracking": "Today",
+  "water": "Water",
+  "glassesOfGoal": "{count} of {goal} glasses",
+  "@glassesOfGoal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "weight": "Weight",
+  "weightHint": "e.g. 58.5",
+  "kg": "kg",
+  "bodyTemperature": "Body temperature",
+  "temperatureHint": "e.g. 36.6",
+  "tapToAdd": "Tap to add",
+  "averageSleep7": "Average sleep (7 days)",
+  "pregnancyChanceToday": "Chance of pregnancy today",
+  "chanceLow": "Low",
+  "chanceMedium": "Medium",
+  "chanceHigh": "High",
+  "aboutMenstrual": "Your period marks the start of a new cycle. The lining of the uterus is shed, and it is normal to feel lower on energy for a few days.",
+  "aboutFollicular": "After your period, estrogen rises and your body prepares to release an egg. Most people feel more energetic and focused in this phase.",
+  "aboutOvulation": "An egg is released around now. This is the most fertile part of your cycle.",
+  "aboutLuteal": "After ovulation, progesterone rises. In the days before your period you may notice PMS symptoms such as bloating, tender breasts or mood changes.",
+  "aboutNoData": "Log your period to see which phase of your cycle you are in and get tips that fit it.",
+  "tipMenstrual1": "Rest when you need to. Gentle movement such as walking or stretching can ease cramps.",
+  "tipMenstrual2": "A warm compress on your lower belly may help with pain.",
+  "tipMenstrual3": "Iron-rich foods like lentils, spinach and red meat, plus enough water, help you recover.",
+  "tipFollicular1": "Energy usually rises in this phase, so it is a good time for more intense exercise.",
+  "tipFollicular2": "A good time to start new plans or tasks that need focus.",
+  "tipFollicular3": "Keep your meals balanced with protein and fresh vegetables.",
+  "tipOvulation1": "This is the most fertile time of your cycle.",
+  "tipOvulation2": "Mild one-sided lower belly pain or clearer discharge is usually normal around ovulation.",
+  "tipOvulation3": "Energy and mood are often at their best, so enjoy being active.",
+  "tipLuteal1": "PMS symptoms such as bloating or mood changes may show up. Go easy on yourself.",
+  "tipLuteal2": "Cutting back on salt, caffeine and sugar can ease bloating and irritability.",
+  "tipLuteal3": "Prioritise sleep and lighter exercise such as yoga or walking.",
+  "tipGeneral1": "Log your period regularly. Predictions get more accurate after a few cycles.",
+  "tipGeneral2": "Drink enough water and keep a steady sleep schedule.",
+  "tipGeneral3": "See a doctor if your cycles are often shorter than 21 or longer than 35 days, or if the pain is severe.",
+  "yourName": "Your name",
+  "nameHint": "What should we call you?",
+  "noName": "Dear friend",
+  "trackingSince": "Tracking since {date}",
+  "@trackingSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "daysLogged": "Days logged",
+  "periodsLogged": "Periods logged",
+  "cycleSettings": "Cycle settings",
+  "cycleSettingsHint": "Used for predictions until you have logged a few cycles.",
+  "cycleLength": "Cycle length",
+  "cycleLengthHint": "From the first day of one period to the first day of the next. Usually 21 to 35 days.",
+  "periodLength": "Period length",
+  "periodLengthHint": "How many days your bleeding usually lasts. Usually 3 to 7 days.",
+  "lutealLength": "Luteal phase length",
+  "lutealLengthHint": "Days between ovulation and your next period. Leave it at 14 unless you know yours.",
+  "privacyNote": "Everything stays on this device. Little Moon works fully offline and never sends your data anywhere.",
+  "settings": "Settings",
+  "language": "Language",
+  "calendarType": "Calendar",
+  "calendarJalali": "Solar Hijri (Shamsi)",
+  "calendarGregorian": "Gregorian",
+  "theme": "Theme",
+  "themeMoon": "Moon",
+  "themeSakura": "Sakura",
+  "themeLavender": "Lavender",
+  "themeOcean": "Ocean",
+  "themeMint": "Mint",
+  "themeSunset": "Sunset",
+  "themeMidnight": "Midnight",
+  "themeNightRose": "Night rose",
+  "dataAndBackup": "Data and backup",
+  "backupHint": "Your backup is plain text that you can keep anywhere you like.",
+  "copyBackup": "Copy backup to clipboard",
+  "backupCopied": "Backup copied. Paste it somewhere safe.",
+  "restoreBackup": "Restore from backup",
+  "restoreHint": "Paste your backup text here",
+  "restoreInvalid": "This is not a valid Little Moon backup.",
+  "restoreConfirm": "This replaces everything currently in the app with the backup. Continue?",
+  "restore": "Restore",
+  "restoreDone": "Backup restored.",
+  "deleteAllData": "Delete all data",
+  "deleteAllConfirm": "All your logs, profile and settings will be permanently deleted. This cannot be undone.",
+  "onboardingWelcomeTitle": "Welcome",
+  "onboardingWelcomeBody": "Little Moon helps you track your period and know what is coming next. A few quick questions to get started.",
+  "lastPeriodQuestion": "When did your last period start?",
+  "lastPeriodHint": "Pick the first day of bleeding. You can change it later.",
+  "dontRemember": "I do not remember",
+  "periodLengthQuestion": "How long does your period usually last?",
+  "cycleLengthQuestion": "How long is your cycle usually?",
+  "getStarted": "Get started",
+  "insightsTitle": "Cycle insights",
+  "dedication": "This app is dedicated to my little moon",
+  "editProfile": "Edit profile",
+  "chooseAvatar": "Choose your avatar",
+  "aboutDeveloper": "About the developer",
+  "aboutAppBody": "Little Moon is a private, free and offline platform for girls and women to track their periods. It predicts your monthly cycle from the information you log yourself and shows it to you. All your data is stored only on your own phone.",
+  "appVersion": "Version {version}",
+  "@appVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "developer": "Made by",
+  "email": "Email",
+  "website": "Website",
+  "telegram": "Telegram",
+  "instagram": "Instagram",
+  "copied": "Copied",
+  "madeWithLove": "Made by ALION"
+}
