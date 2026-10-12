@@ -30,7 +30,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.littlemoon.app.little_moon"
+        // Permanent store identity (Cafe Bazaar, Myket). Never change after publishing.
+        applicationId = "ir.littlemoon"
 
         minSdk = flutter.minSdkVersion
         targetSdk = 36
