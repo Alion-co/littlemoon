@@ -65,12 +65,12 @@ flutter_launcher_icons:
   android: true
   ios: false
   image_path: "assets/images/logo/littlemoon_icon_full.png"
-  adaptive_icon_background: "#E7D8EE"
+  adaptive_icon_background: "#E2D1EC"
   adaptive_icon_foreground: "assets/images/logo/littlemoon_icon_foreground.png"
   web:
     generate: true
     image_path: "assets/images/logo/littlemoon_icon_full.png"
-    background_color: "#E7D8EE"
+    background_color: "#E2D1EC"
     theme_color: "#D84D88"
 
 flutter:

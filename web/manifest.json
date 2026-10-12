@@ -1,11 +1,15 @@
 {
-    "name": "little_moon",
-    "short_name": "little_moon",
+    "name": "Little Moon",
+    "short_name": "Little Moon",
     "start_url": ".",
-    "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "Period cycle can be cute.",
+    "display": "fullscreen",
+    "display_override": [
+        "fullscreen",
+        "standalone"
+    ],
+    "background_color": "#F8F5FA",
+    "theme_color": "#F8F5FA",
+    "description": "A private, free and offline period tracker.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -60,8 +60,11 @@ class AboutPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
           children: [
             PageHeader(
               title: l10n.aboutDeveloper,
@@ -217,23 +220,21 @@ class AboutPage extends StatelessWidget {
               ),
             ],
 
-            const SizedBox(height: 28),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.favorite_rounded,
-                  size: 14,
-                  color: theme.colorScheme.primary,
+          ],
+        ),
+            ),
+
+            // ---------- امضای سازنده، پایین صفحه ----------
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+              child: Text(
+                l10n.madeWithLove,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: subtitleColor.withValues(alpha: 0.75),
+                  letterSpacing: 0.4,
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  l10n.madeWithLove,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: subtitleColor,
-                  ),
-                ),
-              ],
+              ),
             ),
           ],
         ),
