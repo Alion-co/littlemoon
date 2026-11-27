@@ -48,14 +48,15 @@ Little Moon پریود بعدی، تخمک‌گذاری و روزهای بارو
 
 ۵ زبان با پشتیبانی کامل راست‌به‌چپ (فارسی، English، العربية، Español، Türkçe) · ۸ تم روشن و تیره · تقویم شمسی و میلادی
 
-## حریم خصوصی
+</div>
 
-همه‌ی داده‌ها فقط روی گوشی خودت می‌مونه: بدون اینترنت، بدون ردیابی
+<p align="center">
+  <img src="docs/readme/disclaimer.png" width="262" alt="هشدار · Disclaimer: پیش‌بینی‌ها فقط تخمین‌ان، نه توصیه‌ی پزشکی و نه روش پیشگیری از بارداری">
+  <a href="https://github.com/Alion-co/littlemoon/issues"><img src="docs/readme/contribute.png" width="262" alt="مشارکت · Contribute: Issues و Pull Request خوش‌آمده"></a>
+  <img src="docs/readme/privacy.png" width="262" alt="حریم خصوصی · Privacy: همه‌ی داده‌ها فقط روی گوشی خودت می‌مونه">
+</p>
 
-## مشارکت
-
-ایده یا مشکلی داری؟ توی [Issues](https://github.com/Alion-co/littlemoon/issues) بنویس یا Pull Request بفرست
-ترجمه‌ها فایل `.arb` توی پوشه‌ی `l10n/` هستن و برای اضافه کردن یه زبان لازم نیست کد بزنی
+<div dir="rtl">
 
 <details>
 <summary>برای توسعه‌دهنده‌ها</summary>
@@ -86,10 +87,6 @@ lib/
 ```
 
 </details>
-
-## هشدار
-
-پیش‌بینی‌ها فقط تخمین‌ان؛ نه توصیه‌ی پزشکی‌ان و نه روش پیشگیری از بارداری
 
 ## مجوز
 
