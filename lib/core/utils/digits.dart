@@ -38,7 +38,7 @@ String localizeDigits(String input, String languageCode) =>
 extension LocalizedDigits on BuildContext {
   /// عدد/متن رو با رقم‌های زبان فعلی برنامه نشون می‌ده.
   String n(Object value) => localizeDigits(
-        value.toString(),
-        Localizations.localeOf(this).languageCode,
-      );
+    value.toString(),
+    Localizations.localeOf(this).languageCode,
+  );
 }

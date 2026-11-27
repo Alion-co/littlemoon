@@ -1,5 +1,6 @@
 import '../../data/models/app_settings.dart';
 import '../engine/cycle_engine.dart';
+import '../engine/pattern_finder.dart';
 
 enum ReminderType {
   periodSoon,
@@ -9,6 +10,9 @@ enum ReminderType {
   fertileToday,
   ovulationToday,
   logToday,
+
+  /// هشدار زودهنگام: «همین حوالی معمولاً سردرد داری»
+  patternSoon,
 }
 
 class AppReminder {
@@ -17,7 +21,14 @@ class AppReminder {
   /// تعداد روز مربوط به یادآور (مثلاً «۲ روز تا پریود»).
   final int days;
 
-  const AppReminder(this.type, [this.days = 0]);
+  /// برای [ReminderType.patternSoon]: الگوهایی که الان وقتشونه.
+  final List<PersonalPattern> patterns;
+
+  const AppReminder(
+    this.type, [
+    this.days = 0,
+    this.patterns = const <PersonalPattern>[],
+  ]);
 }
 
 /// یادآورهای داخل برنامه رو از روی وضعیت چرخه و تنظیمات کاربر می‌سازه.
@@ -26,6 +37,7 @@ abstract final class ReminderService {
     required CycleSnapshot cycle,
     required AppSettings settings,
     required bool loggedToday,
+    List<PersonalPattern> patterns = const [],
   }) {
     final reminders = <AppReminder>[];
 
@@ -55,6 +67,20 @@ abstract final class ReminderService {
           reminders.add(const AppReminder(ReminderType.fertileSoon, 1));
         } else if (cycle.isInFertileWindow) {
           reminders.add(const AppReminder(ReminderType.fertileToday));
+        }
+      }
+    }
+
+    // هشدار زودهنگام الگوهای شخصی (مثلاً سردرد قبل از عادت ماهانه)
+    if (cycle.hasData && settings.periodReminder && !cycle.isPeriodOngoing) {
+      final until = cycle.daysUntilNextPeriod;
+      if (until != null && until > 0) {
+        final due = <PersonalPattern>[
+          for (final pattern in PatternFinder.warnable(patterns))
+            if (pattern.day + PatternFinder.warningLeadDays == until) pattern,
+        ];
+        if (due.isNotEmpty) {
+          reminders.add(AppReminder(ReminderType.patternSoon, until, due));
         }
       }
     }

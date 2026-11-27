@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:little_moon/core/constants/app_radius.dart';
 import 'package:little_moon/core/localization/calendar_provider.dart';
-import 'package:little_moon/core/theme/themes/moon_colors.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 import 'package:little_moon/core/utils/digits.dart';
 import 'package:little_moon/data/models/user_profile.dart';
 import 'package:little_moon/data/repositories/log_repository.dart';
@@ -10,9 +11,9 @@ import 'package:little_moon/data/repositories/profile_repository.dart';
 import 'package:little_moon/domain/services/cycle_providers.dart';
 import 'package:little_moon/l10n/generated/app_localizations.dart';
 import 'package:little_moon/shared/widgets/dialogs.dart';
-import 'package:little_moon/shared/widgets/moon_card.dart';
 import 'package:little_moon/shared/widgets/page_header.dart';
 import 'package:little_moon/shared/widgets/section_header.dart';
+import 'package:little_moon/shared/widgets/stat_tile.dart';
 import 'package:little_moon/shared/widgets/tab_scaffold.dart';
 import 'package:little_moon/shared/widgets/user_avatar.dart';
 
@@ -23,85 +24,62 @@ class ProfilePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final moon = theme.extension<MoonColors>();
     final l10n = AppLocalizations.of(context)!;
-    final subtitleColor = moon?.subtitle ?? theme.colorScheme.onSurfaceVariant;
 
     final profile = ref.watch(profileProvider);
     final cycle = ref.watch(cycleProvider);
-    final logs = ref.watch(logsProvider);
+    final loggedDays = ref.watch(logsProvider.select((logs) => logs.length));
     final calendar = ref.watch(appCalendarProvider);
     final notifier = ref.read(profileProvider.notifier);
 
-    final firstPeriod = cycle.periods.isEmpty ? null : cycle.periods.first.start;
-    final displayName =
-        profile.name.trim().isEmpty ? l10n.noName : profile.name.trim();
+    final firstPeriod = cycle.periods.isEmpty
+        ? null
+        : cycle.periods.first.start;
+    final displayName = profile.name.trim().isEmpty
+        ? l10n.noName
+        : profile.name.trim();
+
+    // رنگ آیکن‌ها از خود تم می‌آد تا توی همه‌ی تم‌ها (روشن و تیره) جور باشه.
+    final cycleColor = context.scheme.primary;
+    final periodColor = context.scheme.secondary;
+    final lutealColor = context.moon?.ovulation ?? context.scheme.tertiary;
+
+    Future<void> editValue({
+      required String title,
+      required String description,
+      required int value,
+      required int min,
+      required int max,
+      required UserProfile Function(int) apply,
+    }) async {
+      final result = await showStepperDialog(
+        context: context,
+        title: title,
+        description: description,
+        value: value,
+        min: min,
+        max: max,
+        unit: l10n.days,
+      );
+      if (result != null) await notifier.save(apply(result));
+    }
 
     return TabScaffold(
-      currentIndex: 4,
+      currentIndex: -1,
       children: [
         const SizedBox(height: 12),
-        PageHeader(
-          title: l10n.profile,
-          onBack: () => context.go('/home'),
-        ),
+        PageHeader(title: l10n.profile, onBack: () => context.go('/home')),
         const SizedBox(height: 16),
 
         // ---------- کارت کاربر ----------
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                moon?.heroStart ?? theme.colorScheme.surface,
-                moon?.heroEnd ?? theme.colorScheme.surface,
-              ],
-            ),
-            borderRadius: BorderRadius.circular(28),
-          ),
-          child: Row(
-            children: [
-              UserAvatar(avatarId: profile.avatar, radius: 30),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      displayName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      firstPeriod == null
-                          ? l10n.noCycleDataTitle
-                          : l10n.trackingSince(
-                              calendar.dayMonthYear(firstPeriod),
-                            ),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: subtitleColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(
-                tooltip: l10n.edit,
-                onPressed: () => showEditProfileSheet(context),
-                icon: const Icon(Icons.edit_outlined),
-                color: theme.colorScheme.primary,
-              ),
-            ],
-          ),
+        _ProfileHeaderCard(
+          avatarId: profile.avatar,
+          name: displayName,
+          subtitle: firstPeriod == null
+              ? l10n.noCycleDataTitle
+              : l10n.trackingSince(calendar.dayMonthYear(firstPeriod)),
+          editTooltip: l10n.edit,
+          onEdit: () => showEditProfileSheet(context),
         ),
 
         // ---------- خلاصه ----------
@@ -109,18 +87,18 @@ class ProfilePage extends ConsumerWidget {
         Row(
           children: [
             Expanded(
-              child: _CountTile(
-                value: context.n(logs.length),
+              child: StatTile.count(
+                value: context.n(loggedDays),
                 label: l10n.daysLogged,
-                color: moon?.tintA ?? const Color(0xFFFCEEF4),
+                color: context.tintA,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _CountTile(
+              child: StatTile.count(
                 value: context.n(cycle.periods.length),
                 label: l10n.periodsLogged,
-                color: moon?.tintB ?? const Color(0xFFF3EEF9),
+                color: context.tintB,
               ),
             ),
           ],
@@ -133,218 +111,188 @@ class ProfilePage extends ConsumerWidget {
           subtitle: l10n.cycleSettingsHint,
         ),
         const SizedBox(height: 14),
-        MoonCard(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: Column(
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _SettingRow(
-                icon: Icons.circle_outlined,
-                title: l10n.cycleLength,
-                value: context.n('${profile.cycleLength} ${l10n.days}'),
-                onTap: () async {
-                  final value = await showStepperDialog(
-                    context: context,
+              Expanded(
+                child: StatTile(
+                  title: l10n.cycleLength,
+                  value: context.n('${profile.cycleLength} ${l10n.days}'),
+                  icon: Icons.circle_outlined,
+                  iconColor: cycleColor,
+                  color: _soft(context, cycleColor),
+                  fitTitle: true,
+                  onTap: () => editValue(
                     title: l10n.cycleLength,
                     description: l10n.cycleLengthHint,
                     value: profile.cycleLength,
                     min: UserProfile.minCycleLength,
                     max: UserProfile.maxCycleLength,
-                    unit: l10n.days,
-                  );
-                  if (value != null) {
-                    await notifier.save(profile.copyWith(cycleLength: value));
-                  }
-                },
+                    apply: (v) => profile.copyWith(cycleLength: v),
+                  ),
+                ),
               ),
-              Divider(
-                height: 1,
-                color: theme.dividerColor.withValues(alpha: 0.6),
-              ),
-              _SettingRow(
-                icon: Icons.water_drop_outlined,
-                title: l10n.periodLength,
-                value: context.n('${profile.periodLength} ${l10n.days}'),
-                onTap: () async {
-                  final value = await showStepperDialog(
-                    context: context,
+              const SizedBox(width: 10),
+              Expanded(
+                child: StatTile(
+                  title: l10n.periodLength,
+                  value: context.n('${profile.periodLength} ${l10n.days}'),
+                  icon: Icons.water_drop_outlined,
+                  iconColor: periodColor,
+                  color: _soft(context, periodColor),
+                  fitTitle: true,
+                  onTap: () => editValue(
                     title: l10n.periodLength,
                     description: l10n.periodLengthHint,
                     value: profile.periodLength,
                     min: UserProfile.minPeriodLength,
                     max: UserProfile.maxPeriodLength,
-                    unit: l10n.days,
-                  );
-                  if (value != null) {
-                    await notifier.save(profile.copyWith(periodLength: value));
-                  }
-                },
+                    apply: (v) => profile.copyWith(periodLength: v),
+                  ),
+                ),
               ),
-              Divider(
-                height: 1,
-                color: theme.dividerColor.withValues(alpha: 0.6),
-              ),
-              _SettingRow(
-                icon: Icons.egg_outlined,
-                title: l10n.lutealLength,
-                value: context.n('${profile.lutealLength} ${l10n.days}'),
-                onTap: () async {
-                  final value = await showStepperDialog(
-                    context: context,
+              const SizedBox(width: 10),
+              Expanded(
+                child: StatTile(
+                  title: l10n.lutealLength,
+                  value: context.n('${profile.lutealLength} ${l10n.days}'),
+                  icon: Icons.egg_outlined,
+                  iconColor: lutealColor,
+                  color: _soft(context, lutealColor),
+                  fitTitle: true,
+                  onTap: () => editValue(
                     title: l10n.lutealLength,
                     description: l10n.lutealLengthHint,
                     value: profile.lutealLength,
                     min: UserProfile.minLutealLength,
                     max: UserProfile.maxLutealLength,
-                    unit: l10n.days,
-                  );
-                  if (value != null) {
-                    await notifier.save(profile.copyWith(lutealLength: value));
-                  }
-                },
-              ),
-            ],
-          ),
-        ),
-
-        // ---------- سایر ----------
-        const SizedBox(height: 28),
-        MoonCard(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: Column(
-            children: [
-              _SettingRow(
-                icon: Icons.settings_outlined,
-                title: l10n.settings,
-                value: '',
-                onTap: () => context.push('/settings'),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 20),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(Icons.shield_outlined, size: 16, color: subtitleColor),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                l10n.privacyNote,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: subtitleColor,
-                  height: 1.6,
+                    apply: (v) => profile.copyWith(lutealLength: v),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+
         const SizedBox(height: 110),
       ],
     );
   }
+
+  /// پس‌زمینه‌ی ملایم هر کاشی: رنگ آیکن، خیلی کم‌رنگ روی سطح کارت.
+  static Color _soft(BuildContext context, Color base) => Color.alphaBlend(
+    base.withValues(alpha: 0.12),
+    context.scheme.surface,
+  );
 }
 
-class _CountTile extends StatelessWidget {
-  final String value;
-  final String label;
-  final Color color;
+/// کارت بالای پروفایل: آواتار بزرگ با حلقه‌ی گرادیانتی، نام و زیرعنوان
+/// وسط‌چین، و نشان مداد روی گوشه‌ی آواتار برای ویرایش.
+class _ProfileHeaderCard extends StatelessWidget {
+  final int avatarId;
+  final String name;
+  final String subtitle;
+  final String editTooltip;
+  final VoidCallback onEdit;
 
-  const _CountTile({
-    required this.value,
-    required this.label,
-    required this.color,
+  const _ProfileHeaderCard({
+    required this.avatarId,
+    required this.name,
+    required this.subtitle,
+    required this.editTooltip,
+    required this.onEdit,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final moon = theme.extension<MoonColors>();
+    final scheme = context.scheme;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
       decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(22),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            context.moon?.heroStart ?? scheme.surface,
+            context.moon?.heroEnd ?? scheme.surface,
+          ],
+        ),
+        borderRadius: AppRadius.br28,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // حلقه‌ی گرادیانتی دور آواتار
+              Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [scheme.primary, scheme.secondary],
+                  ),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: scheme.surface,
+                  ),
+                  child: UserAvatar(avatarId: avatarId, radius: 40),
+                ),
+              ),
+              // نشان مداد (ویرایش)
+              PositionedDirectional(
+                end: -2,
+                bottom: -2,
+                child: Tooltip(
+                  message: editTooltip,
+                  child: Material(
+                    color: scheme.primary,
+                    shape: CircleBorder(
+                      side: BorderSide(color: scheme.surface, width: 2.5),
+                    ),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: onEdit,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(
+                          Icons.edit_rounded,
+                          size: 16,
+                          color: scheme.onPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
           Text(
-            value,
-            style: theme.textTheme.headlineSmall?.copyWith(
+            name,
+            maxLines: 1,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            style: context.text.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onSurface,
+              color: scheme.onSurface,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: moon?.subtitle ?? theme.colorScheme.onSurfaceVariant,
-            ),
+            subtitle,
+            textAlign: TextAlign.center,
+            style: context.text.bodySmall?.copyWith(color: context.subtitle),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _SettingRow extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String value;
-  final VoidCallback onTap;
-
-  const _SettingRow({
-    required this.icon,
-    required this.title,
-    required this.value,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final moon = theme.extension<MoonColors>();
-    final subtitleColor = moon?.subtitle ?? theme.colorScheme.onSurfaceVariant;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 20,
-              color: theme.colorScheme.primary.withValues(alpha: 0.85),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface,
-                ),
-              ),
-            ),
-            Text(
-              value,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(width: 4),
-            Icon(
-              Icons.chevron_right_rounded,
-              size: 20,
-              color: subtitleColor,
-            ),
-          ],
-        ),
       ),
     );
   }

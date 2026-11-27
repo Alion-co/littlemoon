@@ -54,14 +54,14 @@ class UserProfile {
   }
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'cycleLength': cycleLength,
-        'periodLength': periodLength,
-        'lutealLength': lutealLength,
-        if (birthYear != null) 'birthYear': birthYear,
-        'avatar': avatar,
-        'onboardingDone': onboardingDone,
-      };
+    'name': name,
+    'cycleLength': cycleLength,
+    'periodLength': periodLength,
+    'lutealLength': lutealLength,
+    if (birthYear != null) 'birthYear': birthYear,
+    'avatar': avatar,
+    'onboardingDone': onboardingDone,
+  };
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     int readInt(String key, int fallback, int min, int max) {
@@ -74,12 +74,19 @@ class UserProfile {
     final birthYear = json['birthYear'];
     return UserProfile(
       name: name is String ? name : '',
-      cycleLength:
-          readInt('cycleLength', 28, minCycleLength, maxCycleLength),
-      periodLength:
-          readInt('periodLength', 5, minPeriodLength, maxPeriodLength),
-      lutealLength:
-          readInt('lutealLength', 14, minLutealLength, maxLutealLength),
+      cycleLength: readInt('cycleLength', 28, minCycleLength, maxCycleLength),
+      periodLength: readInt(
+        'periodLength',
+        5,
+        minPeriodLength,
+        maxPeriodLength,
+      ),
+      lutealLength: readInt(
+        'lutealLength',
+        14,
+        minLutealLength,
+        maxLutealLength,
+      ),
       birthYear: birthYear is num ? birthYear.toInt() : null,
       avatar: readInt('avatar', 0, 0, 99),
       onboardingDone: json['onboardingDone'] == true,

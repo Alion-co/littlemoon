@@ -77,8 +77,8 @@ class DailyLog {
     this.weightKg,
     this.temperatureC,
     this.waterGlasses,
-  })  : date = dayOnly(date),
-        symptoms = symptoms ?? const <String>{};
+  }) : date = dayOnly(date),
+       symptoms = symptoms ?? const <String>{};
 
   /// روز پریود حساب می‌شه اگه خونریزی واقعی ثبت شده باشه
   /// (لکه‌بینی شروع پریود حساب نمی‌شه).
@@ -103,6 +103,11 @@ class DailyLog {
 
   DailyLog withWater(int? value) => _copy(water: value, setWater: true);
 
+  DailyLog withMood(Mood? value) => _copy(mood: value, setMood: true);
+
+  DailyLog withSymptoms(Set<String> value) =>
+      _copy(symptoms: value, setSymptoms: true);
+
   DailyLog withWeight(double? value) => _copy(weight: value, setWeight: true);
 
   DailyLog withTemperature(double? value) =>
@@ -111,6 +116,10 @@ class DailyLog {
   DailyLog _copy({
     FlowLevel? flow,
     bool setFlow = false,
+    Mood? mood,
+    bool setMood = false,
+    Set<String>? symptoms,
+    bool setSymptoms = false,
     int? water,
     bool setWater = false,
     double? weight,
@@ -121,11 +130,11 @@ class DailyLog {
     return DailyLog(
       date: date,
       flow: setFlow ? flow : this.flow,
-      mood: mood,
+      mood: setMood ? mood : this.mood,
       pain: pain,
       energy: energy,
       sleepMinutes: sleepMinutes,
-      symptoms: symptoms,
+      symptoms: setSymptoms ? symptoms : this.symptoms,
       note: note,
       weightKg: setWeight ? weight : weightKg,
       temperatureC: setTemperature ? temperature : temperatureC,

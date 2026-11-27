@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:little_moon/core/constants/app_radius.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 import 'package:little_moon/domain/services/cycle_providers.dart';
 import 'package:little_moon/features/symptoms/daily_log_sheet.dart';
 import 'package:little_moon/l10n/generated/app_localizations.dart';
@@ -56,12 +58,7 @@ class CheckinChips extends ConsumerWidget {
     ];
 
     void open(_ChipData chip) {
-      showDailyLogSheet(
-        context,
-        ref: ref,
-        date: today,
-        focus: chip.section,
-      );
+      showDailyLogSheet(context, ref: ref, date: today, focus: chip.section);
     }
 
     // تم شب: شش کاشی شیشه‌ای هم‌اندازه در یک ردیف
@@ -120,8 +117,7 @@ class _NightTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final accent = theme.colorScheme.secondary;
+    final accent = context.scheme.secondary;
 
     return GestureDetector(
       onTap: onTap,
@@ -133,7 +129,7 @@ class _NightTile extends StatelessWidget {
           color: data.done
               ? accent.withValues(alpha: 0.28)
               : Colors.white.withValues(alpha: 0.07),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: AppRadius.br16,
           border: Border.all(
             color: data.done
                 ? accent.withValues(alpha: 0.9)
@@ -150,7 +146,7 @@ class _NightTile extends StatelessWidget {
               child: Text(
                 data.label,
                 maxLines: 1,
-                style: theme.textTheme.labelSmall?.copyWith(
+                style: context.text.labelSmall?.copyWith(
                   color: Colors.white.withValues(alpha: 0.9),
                 ),
               ),

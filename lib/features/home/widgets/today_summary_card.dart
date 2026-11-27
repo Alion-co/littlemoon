@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:little_moon/core/constants/app_radius.dart';
 import 'package:little_moon/core/localization/labels.dart';
-import 'package:little_moon/core/theme/themes/moon_colors.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 import 'package:little_moon/core/utils/digits.dart';
 import 'package:little_moon/domain/services/cycle_providers.dart';
 import 'package:little_moon/l10n/generated/app_localizations.dart';
@@ -82,9 +83,9 @@ class TodaySummaryCard extends ConsumerWidget {
 
     final title = Text(
       l10n.todaysSummary,
-      style: theme.textTheme.titleSmall?.copyWith(
+      style: context.text.titleSmall?.copyWith(
         fontWeight: FontWeight.w600,
-        color: theme.colorScheme.onSurface,
+        color: context.scheme.onSurface,
       ),
     );
 
@@ -92,7 +93,7 @@ class TodaySummaryCard extends ConsumerWidget {
 
     // ---------- تم شب ----------
     if (night) {
-      final accent = theme.colorScheme.secondary;
+      final accent = context.scheme.secondary;
 
       return Container(
         padding: const EdgeInsets.all(16),
@@ -105,10 +106,8 @@ class TodaySummaryCard extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.fromLTRB(10, 12, 10, 12),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.14),
-                ),
+                borderRadius: AppRadius.br18,
+                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
               ),
               child: itemsRow,
             ),
@@ -139,7 +138,7 @@ class TodaySummaryCard extends ConsumerWidget {
                           const SizedBox(width: 8),
                           Text(
                             logLabel.replaceAll('\n', ' '),
-                            style: theme.textTheme.labelLarge?.copyWith(
+                            style: context.text.labelLarge?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
                             ),
@@ -165,20 +164,16 @@ class TodaySummaryCard extends ConsumerWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                title,
-                const SizedBox(height: 14),
-                itemsRow,
-              ],
+              children: [title, const SizedBox(height: 14), itemsRow],
             ),
           ),
           const SizedBox(width: 10),
           Material(
-            color: theme.colorScheme.primary,
-            borderRadius: BorderRadius.circular(18),
+            color: context.scheme.primary,
+            borderRadius: AppRadius.br18,
             child: InkWell(
               onTap: onLogTap,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: AppRadius.br18,
               child: Container(
                 width: 68,
                 height: 92,
@@ -195,7 +190,7 @@ class TodaySummaryCard extends ConsumerWidget {
                     Text(
                       logLabel,
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.labelMedium?.copyWith(
+                      style: context.text.labelMedium?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                         height: 1.2,
@@ -227,34 +222,31 @@ class _SummaryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final moon = theme.extension<MoonColors>();
-    final subtitleColor = moon?.subtitle ?? theme.colorScheme.onSurfaceVariant;
     final iconColor = centered
         ? Colors.white.withValues(alpha: 0.85)
-        : theme.colorScheme.primary.withValues(alpha: 0.85);
+        : context.scheme.primary.withValues(alpha: 0.85);
 
     return Column(
-      crossAxisAlignment:
-          centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      crossAxisAlignment: centered
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 15, color: iconColor),
-            const SizedBox(width: 4),
-            Flexible(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: subtitleColor,
-                ),
-              ),
-            ),
-          ],
+        // آیکون بالای برچسب می‌ره تا برچسب کل عرض ستون رو داشته باشه؛
+        // قبلاً «خلق‌وخو» کنار آیکون جا نمی‌شد و با «…» بریده می‌شد.
+        Icon(icon, size: 15, color: iconColor),
+        const SizedBox(height: 2),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: centered
+              ? Alignment.center
+              : AlignmentDirectional.centerStart,
+          child: Text(
+            label,
+            maxLines: 1,
+            softWrap: false,
+            style: context.text.labelSmall?.copyWith(color: context.subtitle),
+          ),
         ),
         const SizedBox(height: 4),
         FittedBox(
@@ -262,9 +254,9 @@ class _SummaryItem extends StatelessWidget {
           child: Text(
             value,
             maxLines: 1,
-            style: theme.textTheme.bodyMedium?.copyWith(
+            style: context.text.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
+              color: context.scheme.onSurface,
             ),
           ),
         ),

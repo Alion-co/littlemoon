@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:little_moon/features/home/widgets/floating_navbar.dart';
+import 'package:little_moon/shared/widgets/floating_navbar.dart';
 
 /// قاب مشترک صفحه‌های اصلی: محتوای قابل اسکرول + نوار پایین شناور.
 ///
@@ -26,23 +26,23 @@ class TabScaffold extends StatelessWidget {
         if (!didPop) context.go('/home');
       },
       child: Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: children,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: children,
+                  ),
                 ),
               ),
-            ),
-            FloatingNavbar(currentIndex: currentIndex),
-          ],
+              FloatingNavbar(currentIndex: currentIndex),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }

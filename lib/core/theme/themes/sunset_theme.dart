@@ -20,13 +20,13 @@ class SunsetTheme {
   );
 
   static ThemeData get theme => buildAppTheme(
-        brightness: Brightness.light,
-        primary: const Color(0xFFEC6A3A),
-        secondary: const Color(0xFFD84D88),
-        background: const Color(0xFFFFF8F3),
-        surface: const Color(0xFFFFFFFF),
-        onSurface: const Color(0xFF3A2A22),
-        outline: const Color(0xFFF6DDCD),
-        colors: colors,
-      );
+    brightness: Brightness.light,
+    primary: const Color(0xFFEC6A3A),
+    secondary: const Color(0xFFD84D88),
+    background: const Color(0xFFFFF8F3),
+    surface: const Color(0xFFFFFFFF),
+    onSurface: const Color(0xFF3A2A22),
+    outline: const Color(0xFFF6DDCD),
+    colors: colors,
+  );
 }

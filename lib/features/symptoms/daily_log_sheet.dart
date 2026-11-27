@@ -1,19 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:little_moon/core/constants/app_radius.dart';
 import 'package:little_moon/core/localization/calendar_provider.dart';
 import 'package:little_moon/core/localization/labels.dart';
-import 'package:little_moon/core/theme/themes/moon_colors.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 import 'package:little_moon/core/utils/day_utils.dart';
 import 'package:little_moon/core/utils/digits.dart';
-import 'package:little_moon/core/utils/math_utils.dart';
+import 'package:little_moon/core/utils/haptics.dart';
 import 'package:little_moon/data/models/daily_log.dart';
 import 'package:little_moon/data/repositories/log_repository.dart';
 import 'package:little_moon/domain/services/cycle_providers.dart';
 import 'package:little_moon/l10n/generated/app_localizations.dart';
-import 'package:little_moon/shared/widgets/option_pill.dart';
+
+import 'sections/choice_wrap.dart';
+import 'sections/log_block.dart';
+import 'sections/log_card.dart';
+import 'sections/log_sheet_chrome.dart';
+import 'sections/note_field.dart';
+import 'sections/sleep_section.dart';
+import 'sections/symptoms_section.dart';
 
 /// بخش‌های فرم ثبت روزانه — برای پریدن مستقیم به یک بخش.
 enum LogSection { flow, mood, pain, energy, sleep, symptoms }
+
+/// کارت‌های جمع‌شونده‌ی فرم.
+enum _Card { general, physical, note }
+
+/// هر بخش داخل کدوم کارته (برای باز کردن کارت موقع پریدن به یک بخش).
+_Card _cardOf(LogSection section) => switch (section) {
+  LogSection.mood || LogSection.energy || LogSection.sleep => _Card.general,
+  LogSection.flow || LogSection.pain || LogSection.symptoms => _Card.physical,
+};
 
 /// فرم ثبت روزانه رو برای [date] باز می‌کنه. روزهای آینده قابل ثبت نیستن.
 Future<void> showDailyLogSheet(
@@ -40,10 +57,9 @@ Future<void> showDailyLogSheet(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    backgroundColor: Theme.of(context).colorScheme.surface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-    ),
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+    clipBehavior: Clip.antiAlias,
+    shape: const RoundedRectangleBorder(borderRadius: AppRadius.sheetTop),
     builder: (sheetContext) => DailyLogSheet(date: dayOnly(date), focus: focus),
   );
 }
@@ -72,6 +88,9 @@ class _DailyLogSheetState extends ConsumerState<DailyLogSheet> {
   int? _sleepMinutes;
   Set<String> _symptoms = <String>{};
 
+  /// کارت‌های بازِ فعلی. یادداشت از اول بازه تا کادرش دیده بشه.
+  final Set<_Card> _open = {_Card.note};
+
   @override
   void initState() {
     super.initState();
@@ -90,6 +109,7 @@ class _DailyLogSheetState extends ConsumerState<DailyLogSheet> {
 
     final focus = widget.focus;
     if (focus != null) {
+      _open.add(_cardOf(focus));
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final target = _sectionKeys[focus]?.currentContext;
         if (target != null) {
@@ -127,6 +147,7 @@ class _DailyLogSheetState extends ConsumerState<DailyLogSheet> {
     );
 
     await ref.read(logsProvider.notifier).save(log);
+    Haptics.success();
     if (mounted) Navigator.of(context).pop();
   }
 
@@ -135,290 +156,211 @@ class _DailyLogSheetState extends ConsumerState<DailyLogSheet> {
     if (mounted) Navigator.of(context).pop();
   }
 
+  void _toggle(_Card card) => setState(() {
+    if (!_open.remove(card)) _open.add(card);
+  });
+
+  /// «سردرد، نفخ» یا «سردرد، نفخ…»؛ جداکننده بر اساس زبان.
+  String _symptomsSummary(AppLocalizations l10n) {
+    if (_symptoms.isEmpty) return '';
+    final separator = (l10n.localeName == 'fa' || l10n.localeName == 'ar')
+        ? '، '
+        : ', ';
+    return [
+      for (final id in SymptomIds.all)
+        if (_symptoms.contains(id)) Labels.symptom(l10n, id),
+    ].join(separator);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final moon = theme.extension<MoonColors>();
     final l10n = AppLocalizations.of(context)!;
     final calendar = ref.watch(appCalendarProvider);
-    final subtitleColor = moon?.subtitle ?? theme.colorScheme.onSurfaceVariant;
     final mediaQuery = MediaQuery.of(context);
-    final sleepMinutes = _sleepMinutes;
+    final background = context.theme.scaffoldBackgroundColor;
 
-    Widget sectionTitle(LogSection? section, IconData icon, String title) {
-      return Padding(
-        key: section == null ? null : _sectionKeys[section],
-        padding: const EdgeInsets.only(top: 22, bottom: 12),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: theme.colorScheme.primary.withValues(alpha: 0.85),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              title,
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+    final sleep = _sleepMinutes;
+    final showHero =
+        !_open.contains(_Card.general) && !_open.contains(_Card.physical);
 
     return Padding(
       padding: EdgeInsets.only(bottom: mediaQuery.viewInsets.bottom),
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: mediaQuery.size.height * 0.88),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 12),
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: theme.dividerColor,
-                borderRadius: BorderRadius.circular(4),
-              ),
+        constraints: BoxConstraints(maxHeight: mediaQuery.size.height * 0.92),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [context.tintA, background],
+              stops: const [0, 0.5],
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 14, 8, 0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.dailyCheckIn,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: theme.colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          calendar.weekdayDayMonth(widget.date),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: subtitleColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (_existing != null)
-                    IconButton(
-                      tooltip: l10n.delete,
-                      onPressed: _delete,
-                      icon: const Icon(Icons.delete_outline_rounded),
-                      color: theme.colorScheme.error,
-                    ),
-                  IconButton(
-                    tooltip: l10n.cancel,
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close_rounded),
-                    color: subtitleColor,
-                  ),
-                ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              LogSheetHeader(
+                calendar: calendar,
+                date: widget.date,
+                onDelete: _existing != null ? _delete : null,
               ),
-            ),
-            Flexible(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ---------- خونریزی ----------
-                    sectionTitle(
-                      LogSection.flow,
-                      Icons.water_drop_outlined,
-                      l10n.flow,
-                    ),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        for (final level in FlowLevel.values)
-                          OptionPill(
-                            label: Labels.flow(l10n, level),
-                            selected: _flow == level,
-                            onTap: () => setState(
-                              () => _flow = _flow == level ? null : level,
-                            ),
-                          ),
-                      ],
-                    ),
-
-                    // ---------- خلق‌وخو ----------
-                    sectionTitle(
-                      LogSection.mood,
-                      Icons.sentiment_satisfied_alt_outlined,
-                      l10n.mood,
-                    ),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        for (final mood in Mood.values)
-                          OptionPill(
-                            icon: Labels.moodIcon(mood),
-                            label: Labels.mood(l10n, mood),
-                            selected: _mood == mood,
-                            onTap: () => setState(
-                              () => _mood = _mood == mood ? null : mood,
-                            ),
-                          ),
-                      ],
-                    ),
-
-                    // ---------- درد ----------
-                    sectionTitle(
-                      LogSection.pain,
-                      Icons.bolt_outlined,
-                      l10n.pain,
-                    ),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        for (var level = 0; level <= 3; level++)
-                          OptionPill(
-                            label: Labels.pain(l10n, level),
-                            selected: _pain == level,
-                            onTap: () => setState(
-                              () => _pain = _pain == level ? null : level,
-                            ),
-                          ),
-                      ],
-                    ),
-
-                    // ---------- انرژی ----------
-                    sectionTitle(LogSection.energy, Icons.air, l10n.energy),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        for (var level = 1; level <= 3; level++)
-                          OptionPill(
-                            label: Labels.energy(l10n, level),
-                            selected: _energy == level,
-                            onTap: () => setState(
-                              () => _energy = _energy == level ? null : level,
-                            ),
-                          ),
-                      ],
-                    ),
-
-                    // ---------- خواب ----------
-                    sectionTitle(
-                      LogSection.sleep,
-                      Icons.nightlight_outlined,
-                      l10n.sleep,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            sleepMinutes == null
-                                ? l10n.notSet
-                                : context.n(Labels.sleep(l10n, sleepMinutes)),
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: sleepMinutes == null
-                                  ? subtitleColor
-                                  : theme.colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                        if (sleepMinutes != null)
-                          TextButton(
-                            onPressed: () =>
-                                setState(() => _sleepMinutes = null),
-                            child: Text(l10n.clear),
-                          ),
-                      ],
-                    ),
-                    Slider(
-                      value: clampDouble((sleepMinutes ?? 0) / 30, 0, 24),
-                      min: 0,
-                      max: 24,
-                      divisions: 24,
-                      onChanged: (value) => setState(
-                        () => _sleepMinutes = value.round() * 30,
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 260),
+                        curve: Curves.easeOutCubic,
+                        alignment: Alignment.topCenter,
+                        child: showHero
+                            ? const LogHero()
+                            : const SizedBox(width: double.infinity),
                       ),
-                    ),
-
-                    // ---------- علائم ----------
-                    sectionTitle(
-                      LogSection.symptoms,
-                      Icons.eco_outlined,
-                      l10n.symptoms,
-                    ),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        for (final id in SymptomIds.all)
-                          OptionPill(
-                            label: Labels.symptom(l10n, id),
-                            selected: _symptoms.contains(id),
-                            onTap: () => setState(() {
-                              if (!_symptoms.remove(id)) _symptoms.add(id);
-                            }),
+                      LogCard(
+                        icon: Icons.sentiment_satisfied_alt_outlined,
+                        title: l10n.logSectionGeneral,
+                        expanded: _open.contains(_Card.general),
+                        onToggle: () => _toggle(_Card.general),
+                        summary: [
+                          LogSummaryItem(
+                            l10n.mood,
+                            _mood == null ? null : Labels.mood(l10n, _mood!),
                           ),
-                      ],
-                    ),
-
-                    // ---------- یادداشت ----------
-                    sectionTitle(null, Icons.edit_outlined, l10n.note),
-                    TextField(
-                      controller: _noteController,
-                      minLines: 2,
-                      maxLines: 4,
-                      maxLength: 500,
-                      textInputAction: TextInputAction.newline,
-                      decoration: InputDecoration(
-                        hintText: l10n.noteHint,
-                        counterText: '',
-                        filled: true,
-                        fillColor: theme.scaffoldBackgroundColor,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: BorderSide.none,
+                          LogSummaryItem(
+                            l10n.energy,
+                            _energy == null
+                                ? null
+                                : Labels.energy(l10n, _energy!),
+                          ),
+                          LogSummaryItem(
+                            l10n.sleep,
+                            sleep == null
+                                ? null
+                                : context.n(Labels.sleep(l10n, sleep)),
+                          ),
+                        ],
+                        body: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            LogBlock(
+                              first: true,
+                              anchorKey: _sectionKeys[LogSection.mood],
+                              icon: Icons.sentiment_satisfied_alt_outlined,
+                              title: l10n.mood,
+                              child: MoodGrid<Mood>(
+                                values: Mood.values,
+                                selected: _mood,
+                                onChanged: (v) => setState(() => _mood = v),
+                                labelOf: (mood) => Labels.mood(l10n, mood),
+                                iconOf: Labels.moodIcon,
+                              ),
+                            ),
+                            LogBlock(
+                              anchorKey: _sectionKeys[LogSection.energy],
+                              icon: Icons.bolt_outlined,
+                              title: l10n.energy,
+                              child: ChoiceWrap<int>(
+                                values: const [1, 2, 3],
+                                selected: _energy,
+                                onChanged: (v) => setState(() => _energy = v),
+                                labelOf: (level) => Labels.energy(l10n, level),
+                              ),
+                            ),
+                            LogBlock(
+                              anchorKey: _sectionKeys[LogSection.sleep],
+                              icon: Icons.nightlight_outlined,
+                              title: l10n.sleep,
+                              trailing: SleepValueLabel(
+                                minutes: _sleepMinutes,
+                                onClear: () =>
+                                    setState(() => _sleepMinutes = null),
+                              ),
+                              child: SleepControl(
+                                minutes: _sleepMinutes,
+                                onChanged: (v) =>
+                                    setState(() => _sleepMinutes = v),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
-              child: SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: FilledButton(
-                  onPressed: _save,
-                  style: FilledButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                  ),
-                  child: Text(
-                    l10n.save,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
+                      const SizedBox(height: 14),
+                      LogCard(
+                        icon: Icons.water_drop_outlined,
+                        title: l10n.logSectionPhysical,
+                        expanded: _open.contains(_Card.physical),
+                        onToggle: () => _toggle(_Card.physical),
+                        summary: [
+                          LogSummaryItem(
+                            l10n.flow,
+                            _flow == null ? null : Labels.flow(l10n, _flow!),
+                          ),
+                          LogSummaryItem(
+                            l10n.pain,
+                            _pain == null ? null : Labels.pain(l10n, _pain!),
+                          ),
+                          LogSummaryItem(
+                            l10n.symptoms,
+                            _symptomsSummary(l10n),
+                          ),
+                        ],
+                        body: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            LogBlock(
+                              first: true,
+                              anchorKey: _sectionKeys[LogSection.flow],
+                              icon: Icons.water_drop_outlined,
+                              title: l10n.flow,
+                              child: ChoiceWrap<FlowLevel>(
+                                values: FlowLevel.values,
+                                selected: _flow,
+                                onChanged: (v) => setState(() => _flow = v),
+                                labelOf: (level) => Labels.flow(l10n, level),
+                              ),
+                            ),
+                            LogBlock(
+                              anchorKey: _sectionKeys[LogSection.pain],
+                              icon: Icons.bolt_outlined,
+                              title: l10n.pain,
+                              child: ChoiceWrap<int>(
+                                values: const [0, 1, 2, 3],
+                                selected: _pain,
+                                onChanged: (v) => setState(() => _pain = v),
+                                labelOf: (level) => Labels.pain(l10n, level),
+                              ),
+                            ),
+                            LogBlock(
+                              anchorKey: _sectionKeys[LogSection.symptoms],
+                              icon: Icons.eco_outlined,
+                              title: l10n.symptoms,
+                              child: SymptomsWrap(
+                                selected: _symptoms,
+                                onToggle: (id) => setState(() {
+                                  if (!_symptoms.remove(id)) _symptoms.add(id);
+                                }),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      LogCard(
+                        icon: Icons.edit_outlined,
+                        title: l10n.logSectionNote,
+                        expanded: _open.contains(_Card.note),
+                        onToggle: () => _toggle(_Card.note),
+                        body: NoteField(controller: _noteController),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ),
-          ],
+              LogSaveButton(onPressed: _save),
+            ],
+          ),
         ),
       ),
     );

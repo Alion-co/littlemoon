@@ -10,11 +10,15 @@ class PlannedNotification {
   final String title;
   final String body;
 
+  /// در حالت مخفی، نوتیفیکیشن روی صفحه‌ی قفل گوشی اصلاً نشون داده نمی‌شه.
+  final bool discreet;
+
   const PlannedNotification({
     required this.id,
     required this.when,
     required this.title,
     required this.body,
+    this.discreet = false,
   });
 }
 
@@ -69,8 +73,10 @@ class NotificationService {
   Future<void> requestPermission() async {
     if (!await _ensureReady()) return;
     try {
-      final android = _plugin.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+      final android = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       await android?.requestNotificationsPermission();
     } catch (error) {
       debugPrint('Notification permission request failed: $error');
@@ -85,14 +91,21 @@ class NotificationService {
     try {
       await _plugin.cancelAll();
 
-      const details = NotificationDetails(
+      // اطلاعات سلامت روی صفحه‌ی قفل گوشی: در حالت عادی فقط «محتوای پنهان»
+      // نشون داده می‌شه و در حالت مخفی هیچ اثری از نوتیفیکیشن نمی‌مونه.
+      NotificationDetails detailsFor(bool discreet) => NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
           _channelName,
           importance: Importance.defaultImportance,
           priority: Priority.defaultPriority,
+          visibility: discreet
+              ? NotificationVisibility.secret
+              : NotificationVisibility.private,
         ),
       );
+      final normalDetails = detailsFor(false);
+      final discreetDetails = detailsFor(true);
 
       final now = DateTime.now();
       for (final item in items) {
@@ -105,7 +118,7 @@ class NotificationService {
           title: item.title,
           body: item.body,
           scheduledDate: tz.TZDateTime.from(item.when, tz.UTC),
-          notificationDetails: details,
+          notificationDetails: item.discreet ? discreetDetails : normalDetails,
           // زمان‌بندی تقریبی کافیه و مجوز «آلارم دقیق» لازم نداره
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:little_moon/core/theme/themes/moon_colors.dart';
+import 'package:little_moon/core/constants/app_radius.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 import 'package:little_moon/core/utils/app_calendar.dart';
 import 'package:little_moon/core/utils/day_utils.dart';
 import 'package:little_moon/domain/engine/cycle_engine.dart';
@@ -34,13 +35,10 @@ class MonthGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final moon = theme.extension<MoonColors>();
-    final subtitleColor = moon?.subtitle ?? theme.colorScheme.onSurfaceVariant;
 
     final firstDay = calendar.firstDayOf(month);
     final daysInMonth = calendar.lengthOf(month);
-    final leadingEmpty =
-        (firstDay.weekday - calendar.firstWeekday + 7) % 7;
+    final leadingEmpty = (firstDay.weekday - calendar.firstWeekday + 7) % 7;
     final rows = ((leadingEmpty + daysInMonth) / 7).ceil();
     final selected = selectedDate;
     final limit = maxDate;
@@ -55,8 +53,8 @@ class MonthGrid extends StatelessWidget {
                 child: Center(
                   child: Text(
                     calendar.weekdayShort(weekday),
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: subtitleColor,
+                    style: context.text.labelSmall?.copyWith(
+                      color: context.subtitle,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -92,8 +90,8 @@ class MonthGrid extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        color: context.scheme.surface,
+        borderRadius: AppRadius.br24,
         border: Border.all(color: theme.dividerColor.withValues(alpha: 0.6)),
       ),
       child: grid,
@@ -145,8 +143,7 @@ class _DayCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final primary = theme.colorScheme.primary;
+    final primary = context.scheme.primary;
     final isPeriod = kind == DayKind.period;
 
     Color background = Colors.transparent;
@@ -179,11 +176,12 @@ class _DayCell extends StatelessWidget {
               ),
               child: Text(
                 label,
-                style: theme.textTheme.bodyMedium?.copyWith(
+                style: context.text.bodyMedium?.copyWith(
                   color: isSelected
-                      ? theme.colorScheme.onPrimary
-                      : theme.colorScheme.onSurface
-                          .withValues(alpha: enabled ? 1 : 0.35),
+                      ? context.scheme.onPrimary
+                      : context.scheme.onSurface.withValues(
+                          alpha: enabled ? 1 : 0.35,
+                        ),
                   fontWeight: (isToday || isSelected)
                       ? FontWeight.bold
                       : FontWeight.w500,

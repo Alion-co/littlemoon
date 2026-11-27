@@ -2,28 +2,35 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../database/local_store.dart';
 import '../models/app_settings.dart';
+import 'data_slice.dart';
+import 'persisted_repository.dart';
 
-class SettingsRepository {
-  SettingsRepository(this._store);
+class SettingsRepository extends PersistedRepository<AppSettings> {
+  SettingsRepository(super.store);
 
-  static const storageKey = 'app_settings_v1';
+  @override
+  String get storageKey => 'app_settings_v1';
 
-  final LocalStore _store;
+  @override
+  String get backupKey => 'settings';
 
-  AppSettings load() {
-    final json = _store.getJson(storageKey);
-    return json == null ? const AppSettings() : AppSettings.fromJson(json);
-  }
+  @override
+  AppSettings get emptyValue => const AppSettings();
 
-  Future<void> save(AppSettings settings) =>
-      _store.setJson(storageKey, settings.toJson());
+  @override
+  Map<String, dynamic> encode(AppSettings value) => value.toJson();
+
+  @override
+  AppSettings decode(Object? raw) => raw is Map
+      ? AppSettings.fromJson(Map<String, dynamic>.from(raw))
+      : emptyValue;
 }
 
 final settingsRepositoryProvider = Provider<SettingsRepository>(
   (ref) => SettingsRepository(ref.watch(localStoreProvider)),
 );
 
-class SettingsNotifier extends StateNotifier<AppSettings> {
+class SettingsNotifier extends StateNotifier<AppSettings> implements DataSlice {
   SettingsNotifier(this._repository) : super(_repository.load());
 
   final SettingsRepository _repository;
@@ -33,6 +40,21 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _repository.save(settings);
   }
 
+  // ---------- DataSlice ----------
+
+  @override
+  String get backupKey => _repository.backupKey;
+
+  @override
+  bool acceptsBackup(Object? raw) => true;
+
+  @override
+  Object? exportBackup() => _repository.toBackup(state);
+
+  @override
+  Future<void> importBackup(Object? raw) => save(_repository.fromBackup(raw));
+
+  @override
   Future<void> reset() => save(const AppSettings());
 }
 

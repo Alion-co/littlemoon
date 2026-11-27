@@ -1,6 +1,11 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
+import 'package:little_moon/shared/animations/soft_motion.dart';
+
+import 'moon_art.dart' show sparklePath;
 
 /// پس‌زمینه‌ی تم شب: آسمان پرستاره، ماه، ابر، تپه‌ها و شاخه‌های گل.
 ///
@@ -13,18 +18,142 @@ class NightSkyBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return RepaintBoundary(
-      child: CustomPaint(
-        size: Size.infinite,
-        painter: _NightSkyPainter(
-          base: theme.scaffoldBackgroundColor,
-          accent: theme.colorScheme.secondary,
-          flower: theme.colorScheme.primary,
-          moonOnLeft: Directionality.of(context) == TextDirection.rtl,
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        RepaintBoundary(
+          child: CustomPaint(
+            size: Size.infinite,
+            painter: _NightSkyPainter(
+              base: theme.scaffoldBackgroundColor,
+              accent: context.scheme.secondary,
+              flower: context.scheme.primary,
+              moonOnLeft: Directionality.of(context) == TextDirection.rtl,
+            ),
+          ),
+        ),
+        // ستاره‌های چشمک‌زن و ستاره‌ی دنباله‌دار، جدا از آسمان ثابت تا آسمان
+        // و تپه‌ها در هر فریم دوباره کشیده نشن
+        const _SkyTwinkle(),
+      ],
+    );
+  }
+}
+
+class _SkyTwinkle extends StatefulWidget {
+  const _SkyTwinkle();
+
+  @override
+  State<_SkyTwinkle> createState() => _SkyTwinkleState();
+}
+
+class _SkyTwinkleState extends State<_SkyTwinkle>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _clock = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 20),
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (reduceMotion(context)) {
+      _clock.stop();
+    } else if (!_clock.isAnimating) {
+      _clock.repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _clock.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: RepaintBoundary(
+        child: CustomPaint(
+          size: Size.infinite,
+          painter: _TwinklePainter(
+            clock: _clock,
+            motion: !reduceMotion(context),
+          ),
         ),
       ),
     );
   }
+}
+
+class _TwinklePainter extends CustomPainter {
+  final Animation<double> clock;
+  final bool motion;
+
+  _TwinklePainter({required this.clock, required this.motion})
+    : super(repaint: clock);
+
+  // جای ستاره‌ها ثابته و یک‌بار ساخته می‌شه (x و y نسبت به صفحه)
+  static final List<({double x, double y, double r, int cycles, double phase})>
+  _stars = () {
+    final random = math.Random(21);
+    return List.generate(
+      14,
+      (_) => (
+        x: random.nextDouble(),
+        y: random.nextDouble() * 0.55,
+        r: 1.8 + random.nextDouble() * 1.6,
+        cycles: 2 + random.nextInt(4),
+        phase: random.nextDouble(),
+      ),
+    );
+  }();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (!motion || size.isEmpty) return;
+    final t = clock.value;
+    final paint = Paint();
+
+    for (final s in _stars) {
+      final tw = 0.5 + 0.5 * math.sin(2 * math.pi * (s.cycles * t + s.phase));
+      paint.color = Colors.white.withValues(alpha: 0.10 + 0.75 * tw);
+      canvas.drawPath(
+        sparklePath(
+          Offset(s.x * size.width, s.y * size.height),
+          s.r * (0.7 + 0.3 * tw),
+        ),
+        paint,
+      );
+    }
+
+    // ستاره‌ی دنباله‌ی خیلی کوتاه، هر ۲۰ ثانیه (حدود ۱٫۲ ثانیه)
+    const from = 0.55;
+    const to = 0.61;
+    if (t >= from && t < to) {
+      final u = (t - from) / (to - from);
+      final a = Offset(size.width * 0.92, size.height * 0.05);
+      final b = Offset(size.width * 0.42, size.height * 0.20);
+      final head = Offset.lerp(a, b, Curves.easeOut.transform(u))!;
+      final dir = (b - a) / (b - a).distance;
+      final fade = math.sin(math.pi * u);
+      final tail = head - dir * (size.width * 0.25 * fade);
+      canvas.drawLine(
+        tail,
+        head,
+        Paint()
+          ..strokeWidth = 1.6
+          ..strokeCap = StrokeCap.round
+          ..shader = ui.Gradient.linear(tail, head, [
+            Colors.white.withValues(alpha: 0),
+            Colors.white.withValues(alpha: 0.9 * fade),
+          ]),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_TwinklePainter old) => old.motion != motion;
 }
 
 class _NightSkyPainter extends CustomPainter {
@@ -69,8 +198,9 @@ class _NightSkyPainter extends CustomPainter {
         random.nextDouble() * h * 0.62,
       );
       final radius = 0.4 + random.nextDouble() * 1.1;
-      starPaint.color =
-          Colors.white.withValues(alpha: 0.25 + random.nextDouble() * 0.6);
+      starPaint.color = Colors.white.withValues(
+        alpha: 0.25 + random.nextDouble() * 0.6,
+      );
       canvas.drawCircle(position, radius, starPaint);
     }
 
@@ -136,8 +266,9 @@ class _NightSkyPainter extends CustomPainter {
       ..lineTo(0, h)
       ..close();
     final farPaint = Paint()
-      ..color = (Color.lerp(base, Colors.black, 0.18) ?? base)
-          .withValues(alpha: 0.85);
+      ..color = (Color.lerp(base, Colors.black, 0.18) ?? base).withValues(
+        alpha: 0.85,
+      );
     canvas.drawPath(farHill, farPaint);
 
     // درخشش دریاچه بین تپه‌ها
@@ -197,8 +328,9 @@ class _NightSkyPainter extends CustomPainter {
       final side = i.isEven ? 1.0 : -1.0;
       final radius = 4.6 - t * 2.6;
 
-      blossomPaint.color =
-          (i % 3 == 0 ? flower : accent).withValues(alpha: 0.50);
+      blossomPaint.color = (i % 3 == 0 ? flower : accent).withValues(
+        alpha: 0.50,
+      );
       canvas.drawCircle(
         Offset(x + side * (6 - t * 3), y),
         radius,

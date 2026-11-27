@@ -1,243 +1,272 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:little_moon/core/constants/app_strings.dart';
-import 'package:little_moon/core/theme/themes/moon_colors.dart';
+import 'package:little_moon/core/constants/app_info.dart';
+import 'package:little_moon/core/constants/app_radius.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 import 'package:little_moon/core/utils/digits.dart';
 import 'package:little_moon/l10n/generated/app_localizations.dart';
+import 'package:little_moon/shared/widgets/designed_by.dart';
 import 'package:little_moon/shared/widgets/dialogs.dart';
-import 'package:little_moon/shared/widgets/moon_card.dart';
+import 'package:little_moon/shared/widgets/moon_logo.dart';
 import 'package:little_moon/shared/widgets/page_header.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class _InfoItem {
-  final IconData icon;
-  final String label;
-  final String value;
+part 'about_widgets.dart';
 
-  const _InfoItem(this.icon, this.label, this.value);
-}
+/// رنگ طلایی برند ALION (همون رنگ شیر لوگو).
+const _alionGold = Color(0xFFB08A4E);
 
-/// درباره‌ی برنامه و سازنده. اطلاعات از [AppInfo] خونده می‌شه.
+/// «درباره‌ی ماه کوچولو»: مینیمال، هم‌سبک برنامه‌ی کهربا.
+///
+/// بالا: آیکون، اسم و معرفی کوتاه برنامه + امتیاز در فروشگاه‌ها.
+/// پایین: نشان ALION و راه‌های تماس با سازنده.
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
+
+  /// لینک رو در برنامه‌ی مناسب باز می‌کنه؛ اگه نشد، متنش کپی می‌شه.
+  static Future<void> _open(
+    BuildContext context,
+    Uri uri, {
+    required String fallbackText,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    var opened = false;
+    try {
+      opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      opened = false;
+    }
+    if (opened || !context.mounted) return;
+    await Clipboard.setData(ClipboardData(text: fallbackText));
+    if (context.mounted) showAppSnackBar(context, l10n.copied);
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final moon = theme.extension<MoonColors>();
     final l10n = AppLocalizations.of(context)!;
-    final subtitleColor = moon?.subtitle ?? theme.colorScheme.onSurfaceVariant;
-
-    // فقط موردهایی که پر شدن نشون داده می‌شن
-    final items = <_InfoItem>[
-      _InfoItem(
-        Icons.mail_outline_rounded,
-        l10n.email,
-        AppInfo.developerEmail,
-      ),
-      _InfoItem(
-        Icons.language_rounded,
-        l10n.website,
-        AppInfo.developerWebsite,
-      ),
-      _InfoItem(
-        Icons.send_outlined,
-        l10n.telegram,
-        AppInfo.developerTelegram,
-      ),
-      _InfoItem(
-        Icons.photo_camera_outlined,
-        l10n.instagram,
-        AppInfo.developerInstagram,
-      ),
-    ].where((item) => item.value.trim().isNotEmpty).toList();
-
-    Future<void> copy(String value) async {
-      await Clipboard.setData(ClipboardData(text: value));
-      if (context.mounted) showAppSnackBar(context, l10n.copied);
-    }
+    final muted = context.subtitle;
+    final primary = context.scheme.primary;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-          children: [
-            PageHeader(
-              title: l10n.aboutDeveloper,
-              onBack: () {
-                if (context.canPop()) {
-                  context.pop();
-                } else {
-                  context.go('/profile');
-                }
-              },
-            ),
-            const SizedBox(height: 24),
-
-            // ---------- لوگو و اسم برنامه ----------
-            Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(26),
-                child: Image.asset(
-                  'assets/images/logo/littlemoon_icon_full.png',
-                  width: 104,
-                  height: 104,
-                  fit: BoxFit.cover,
-                  // اگه فایل لوگو نبود، یک نشان ساده جاش می‌شینه
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    width: 104,
-                    height: 104,
-                    color: moon?.heroStart ?? theme.colorScheme.surface,
-                    child: Icon(
-                      Icons.nightlight_round,
-                      size: 48,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                ),
+      body: Stack(
+        children: [
+          // دو کمان ظریف تزئینی در گوشه‌های صفحه
+          Positioned.fill(
+            child: IgnorePointer(
+              child: CustomPaint(
+                painter: _ArcsPainter(primary.withValues(alpha: 0.16)),
               ),
             ),
-            const SizedBox(height: 16),
-            Center(
-              child: Text(
-                AppInfo.appName,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Center(
-              child: Text(
-                context.n(l10n.appVersion(AppInfo.version)),
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: subtitleColor,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // ---------- توضیحات برنامه ----------
-            MoonCard(
-              padding: const EdgeInsets.all(18),
-              child: Text(
-                l10n.aboutAppBody,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface,
-                  height: 1.7,
-                ),
-              ),
-            ),
-
-            // ---------- تقدیم ----------
-            const SizedBox(height: 20),
-            Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(text: l10n.dedication),
-                  // ماه درست بعد از آخرین کلمه می‌شینه، حتی اگه متن بشکنه
-                  WidgetSpan(
-                    alignment: PlaceholderAlignment.middle,
-                    child: Padding(
-                      padding: const EdgeInsetsDirectional.only(start: 8),
-                      child: Icon(
-                        Icons.nightlight_round,
-                        size: 18,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.w600,
-                height: 1.6,
-              ),
-            ),
-
-            // ---------- سازنده ----------
-            if (items.isNotEmpty) ...[
-              const SizedBox(height: 28),
-              MoonCard(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                child: Column(
-                  children: [
-                    for (var i = 0; i < items.length; i++) ...[
-                      if (i > 0)
-                        Divider(
-                          height: 1,
-                          color: theme.dividerColor.withValues(alpha: 0.6),
+          ),
+          SafeArea(
+            child: CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+                    child: Column(
+                      children: [
+                        PageHeader(
+                          title: l10n.aboutDeveloper,
+                          onBack: () {
+                            if (context.canPop()) {
+                              context.pop();
+                            } else {
+                              context.go('/settings');
+                            }
+                          },
                         ),
-                      InkWell(
-                        onTap: () => copy(items[i].value),
-                        borderRadius: BorderRadius.circular(14),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          child: Row(
+                        const SizedBox(height: 28),
+
+                        // ---------- برنامه ----------
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: AppRadius.br26,
+                            boxShadow: [
+                              BoxShadow(
+                                color: primary.withValues(alpha: 0.18),
+                                blurRadius: 24,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: const MoonLogo(
+                            size: 96,
+                            borderRadius: AppRadius.br26,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        Text(
+                          l10n.appTitle,
+                          style: context.text.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: context.scheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          l10n.aboutTagline,
+                          textAlign: TextAlign.center,
+                          style: context.text.bodyLarge?.copyWith(color: muted),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          context.n(
+                            '${l10n.appVersion(AppInfo.version)} · '
+                            '${l10n.aboutMeta}',
+                          ),
+                          textAlign: TextAlign.center,
+                          style: context.text.bodySmall?.copyWith(color: muted),
+                        ),
+                        const SizedBox(height: 22),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _PillButton(
+                              label: l10n.rateOnMyket,
+                              onTap: () => _open(
+                                context,
+                                Uri.parse(AppInfo.myketUrl),
+                                fallbackText: AppInfo.myketUrl,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            _PillButton(
+                              label: l10n.rateOnBazaar,
+                              onTap: () => _open(
+                                context,
+                                Uri.parse(AppInfo.bazaarUrl),
+                                fallbackText: AppInfo.bazaarUrl,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+
+                        // ---------- تقدیم ----------
+                        Text.rich(
+                          TextSpan(
                             children: [
-                              Icon(
-                                items[i].icon,
-                                size: 20,
-                                color: theme.colorScheme.primary
-                                    .withValues(alpha: 0.85),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                items[i].label,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: subtitleColor,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  items[i].value,
-                                  textAlign: TextAlign.end,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: theme.colorScheme.onSurface,
+                              TextSpan(text: l10n.dedication),
+                              WidgetSpan(
+                                alignment: PlaceholderAlignment.middle,
+                                child: Padding(
+                                  padding: const EdgeInsetsDirectional.only(
+                                    start: 6,
+                                  ),
+                                  child: Icon(
+                                    Icons.nightlight_round,
+                                    size: 15,
+                                    color: primary,
                                   ),
                                 ),
                               ),
                             ],
                           ),
+                          textAlign: TextAlign.center,
+                          style: context.text.bodySmall?.copyWith(
+                            color: primary,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ],
 
-          ],
-        ),
-            ),
+                        // فضای خالی تا بخش سازنده پایین صفحه بشینه
+                        const Spacer(),
+                        const SizedBox(height: 36),
 
-            // ---------- امضای سازنده، پایین صفحه ----------
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-              child: Text(
-                l10n.madeWithLove,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: subtitleColor.withValues(alpha: 0.75),
-                  letterSpacing: 0.4,
+                        // ---------- سازنده ----------
+                        Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: _alionGold.withValues(alpha: 0.35),
+                                blurRadius: 16,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: const AlionBadge(size: 64),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          AppInfo.developerName,
+                          textDirection: TextDirection.ltr,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 4,
+                            color: _alionGold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          l10n.developerRole,
+                          style: context.text.bodySmall?.copyWith(color: muted),
+                        ),
+                        const SizedBox(height: 22),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _ContactButton(
+                              icon: Icons.call_outlined,
+                              label: l10n.contactCall,
+                              onTap: () => _open(
+                                context,
+                                Uri(
+                                  scheme: 'tel',
+                                  path: AppInfo.developerPhone,
+                                ),
+                                fallbackText: AppInfo.developerPhone,
+                              ),
+                            ),
+                            const SizedBox(width: 22),
+                            _ContactButton(
+                              icon: Icons.photo_camera_outlined,
+                              label: l10n.instagram,
+                              onTap: () => _open(
+                                context,
+                                Uri.parse(
+                                  'https://instagram.com/'
+                                  '${AppInfo.developerInstagram}',
+                                ),
+                                fallbackText: AppInfo.developerInstagram,
+                              ),
+                            ),
+                            const SizedBox(width: 22),
+                            _ContactButton(
+                              icon: Icons.mail_outline_rounded,
+                              label: l10n.email,
+                              onTap: () => _open(
+                                context,
+                                Uri(
+                                  scheme: 'mailto',
+                                  path: AppInfo.developerEmail,
+                                ),
+                                fallbackText: AppInfo.developerEmail,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 36),
+
+                        // ---------- امضا ----------
+                        const DesignedBy(),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

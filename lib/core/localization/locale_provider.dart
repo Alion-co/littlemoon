@@ -12,8 +12,7 @@ const Map<String, String> appLanguages = {
   'tr': 'Türkçe',
 };
 
-final localeProvider =
-StateNotifierProvider<LocaleNotifier, Locale>((ref) {
+final localeProvider = StateNotifierProvider<LocaleNotifier, Locale>((ref) {
   return LocaleNotifier(ref.watch(localStoreProvider));
 });
 

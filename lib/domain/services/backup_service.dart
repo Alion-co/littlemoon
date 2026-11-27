@@ -1,61 +1,56 @@
 import 'dart:convert';
 
-import '../../data/models/app_settings.dart';
-import '../../data/models/daily_log.dart';
-import '../../data/models/user_profile.dart';
-import '../../data/repositories/log_repository.dart';
-
-class BackupData {
-  final UserProfile profile;
-  final AppSettings settings;
-  final Map<String, DailyLog> logs;
-
-  const BackupData({
-    required this.profile,
-    required this.settings,
-    required this.logs,
-  });
-}
+import '../../data/repositories/data_slice.dart';
 
 /// پشتیبان‌گیری آفلاین: کل داده‌ها به یک متن JSON تبدیل می‌شه که کاربر
 /// می‌تونه خودش هر جا خواست نگه داره و بعداً برگردونه.
+///
+/// اینجا هیچ داده‌ی خاصی شناخته نمی‌شه؛ هر تکه از طریق [DataSlice] می‌آد
+/// (فهرستش توی `dataSlicesProvider` ثبت شده).
 abstract final class BackupService {
   static const _app = 'little_moon';
   static const _version = 1;
 
-  static String encode(BackupData data) {
+  /// اسم پیشنهادی فایل پشتیبان، مثل `little-moon-backup-2026-10-27.json`.
+  static String fileName(DateTime now) {
+    String two(int v) => v < 10 ? '0$v' : '$v';
+    return 'little-moon-backup-${now.year}-${two(now.month)}-${two(now.day)}.json';
+  }
+
+  static String encode(Iterable<DataSlice> slices) {
     return const JsonEncoder.withIndent(' ').convert({
       'app': _app,
       'version': _version,
-      'profile': data.profile.toJson(),
-      'settings': data.settings.toJson(),
-      'logs': LogRepository.encode(data.logs),
+      for (final slice in slices) slice.backupKey: slice.exportBackup(),
     });
   }
 
-  /// اگه متن معتبر نباشه `null` برمی‌گردونه.
-  static BackupData? decode(String raw) {
+  /// بخش‌های پشتیبان (کلید ← مقدار خام)، یا `null` اگه متن معتبر نباشه.
+  static Map<String, Object?>? decode(String raw, Iterable<DataSlice> slices) {
     try {
       final decoded = jsonDecode(raw.trim());
       if (decoded is! Map) return null;
       if (decoded['app'] != _app) return null;
 
-      final profile = decoded['profile'];
-      final settings = decoded['settings'];
-      final logs = decoded['logs'];
-      if (logs is! Map) return null;
-
-      return BackupData(
-        profile: profile is Map
-            ? UserProfile.fromJson(Map<String, dynamic>.from(profile))
-            : const UserProfile(onboardingDone: true),
-        settings: settings is Map
-            ? AppSettings.fromJson(Map<String, dynamic>.from(settings))
-            : const AppSettings(),
-        logs: LogRepository.decode(Map<String, dynamic>.from(logs)),
-      );
+      final sections = <String, Object?>{};
+      for (final slice in slices) {
+        final value = decoded[slice.backupKey];
+        if (!slice.acceptsBackup(value)) return null;
+        sections[slice.backupKey] = value;
+      }
+      return sections;
     } catch (_) {
       return null;
+    }
+  }
+
+  /// داده‌های فعلی رو با بخش‌های [sections] جایگزین می‌کنه.
+  static Future<void> restore(
+    Iterable<DataSlice> slices,
+    Map<String, Object?> sections,
+  ) async {
+    for (final slice in slices) {
+      await slice.importBackup(sections[slice.backupKey]);
     }
   }
 }

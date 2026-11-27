@@ -20,13 +20,13 @@ class NightRoseTheme {
   );
 
   static ThemeData get theme => buildAppTheme(
-        brightness: Brightness.dark,
-        primary: const Color(0xFFE55C7C),
-        secondary: const Color(0xFFF0A160),
-        background: const Color(0xFF1B1417),
-        surface: const Color(0xFF281E22),
-        onSurface: const Color(0xFFF8EEF0),
-        outline: const Color(0xFF45333A),
-        colors: colors,
-      );
+    brightness: Brightness.dark,
+    primary: const Color(0xFFE55C7C),
+    secondary: const Color(0xFFF0A160),
+    background: const Color(0xFF1B1417),
+    surface: const Color(0xFF281E22),
+    onSurface: const Color(0xFFF8EEF0),
+    outline: const Color(0xFF45333A),
+    colors: colors,
+  );
 }

@@ -20,13 +20,13 @@ class OceanTheme {
   );
 
   static ThemeData get theme => buildAppTheme(
-        brightness: Brightness.light,
-        primary: const Color(0xFF0F9BA8),
-        secondary: const Color(0xFF6A84F5),
-        background: const Color(0xFFF3FAFB),
-        surface: const Color(0xFFFFFFFF),
-        onSurface: const Color(0xFF16303A),
-        outline: const Color(0xFFD2E8EB),
-        colors: colors,
-      );
+    brightness: Brightness.light,
+    primary: const Color(0xFF0F9BA8),
+    secondary: const Color(0xFF6A84F5),
+    background: const Color(0xFFF3FAFB),
+    surface: const Color(0xFFFFFFFF),
+    onSurface: const Color(0xFF16303A),
+    outline: const Color(0xFFD2E8EB),
+    colors: colors,
+  );
 }

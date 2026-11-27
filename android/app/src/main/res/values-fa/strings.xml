@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_label">ماه کوچولو · کوچک</string>
+    <string name="widget_description_square">روز و فاز چرخه</string>
+</resources>

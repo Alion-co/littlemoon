@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:little_moon/core/localization/calendar_provider.dart';
-import 'package:little_moon/core/theme/themes/moon_colors.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 import 'package:little_moon/core/utils/day_utils.dart';
 import 'package:little_moon/domain/engine/cycle_engine.dart';
 import 'package:little_moon/domain/services/cycle_providers.dart';
@@ -77,8 +77,7 @@ class _DayItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final moon = theme.extension<MoonColors>()!;
+    final moon = context.moon!;
     final night = isNightTheme(context);
 
     // تم شب: روزِ امروز مثل یک ماه کوچکِ درخشان دیده می‌شه
@@ -101,10 +100,10 @@ class _DayItem extends StatelessWidget {
       todayTextColor = const Color(0xFF2A2748);
     } else {
       todayDecoration = BoxDecoration(
-        color: theme.colorScheme.primary,
+        color: context.scheme.primary,
         shape: BoxShape.circle,
       );
-      todayTextColor = theme.colorScheme.onPrimary;
+      todayTextColor = context.scheme.onPrimary;
     }
 
     return GestureDetector(
@@ -116,7 +115,7 @@ class _DayItem extends StatelessWidget {
           // حرف روز هفته
           Text(
             day.label,
-            style: theme.textTheme.labelMedium?.copyWith(
+            style: context.text.labelMedium?.copyWith(
               color: moon.subtitle,
               fontWeight: FontWeight.w500,
             ),
@@ -134,10 +133,8 @@ class _DayItem extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               day.dayText,
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: day.isToday
-                    ? todayTextColor
-                    : theme.colorScheme.onSurface,
+              style: context.text.titleSmall?.copyWith(
+                color: day.isToday ? todayTextColor : context.scheme.onSurface,
                 fontWeight: day.isToday ? FontWeight.bold : FontWeight.w500,
               ),
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:little_moon/core/constants/app_radius.dart';
 
 import 'moon_colors.dart';
 
@@ -46,9 +47,7 @@ ThemeData buildAppTheme({
     cardTheme: CardThemeData(
       color: surface,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(28),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: AppRadius.br28),
     ),
     extensions: [colors],
   );

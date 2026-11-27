@@ -73,10 +73,7 @@ class MoonColors extends ThemeExtension<MoonColors> {
   }
 
   @override
-  MoonColors lerp(
-      ThemeExtension<MoonColors>? other,
-      double t,
-      ) {
+  MoonColors lerp(ThemeExtension<MoonColors>? other, double t) {
     if (other is! MoonColors) {
       return this;
     }
@@ -85,20 +82,16 @@ class MoonColors extends ThemeExtension<MoonColors> {
       heroStart: Color.lerp(heroStart, other.heroStart, t) ?? heroStart,
       heroEnd: Color.lerp(heroEnd, other.heroEnd, t) ?? heroEnd,
       phaseBackground:
-      Color.lerp(phaseBackground, other.phaseBackground, t) ??
+          Color.lerp(phaseBackground, other.phaseBackground, t) ??
           phaseBackground,
-      phaseText:
-      Color.lerp(phaseText, other.phaseText, t) ?? phaseText,
+      phaseText: Color.lerp(phaseText, other.phaseText, t) ?? phaseText,
       ringBackground:
-      Color.lerp(ringBackground, other.ringBackground, t) ??
-          ringBackground,
-      subtitle:
-      Color.lerp(subtitle, other.subtitle, t) ?? subtitle,
+          Color.lerp(ringBackground, other.ringBackground, t) ?? ringBackground,
+      subtitle: Color.lerp(subtitle, other.subtitle, t) ?? subtitle,
       avatarBackground:
-      Color.lerp(avatarBackground, other.avatarBackground, t) ??
+          Color.lerp(avatarBackground, other.avatarBackground, t) ??
           avatarBackground,
-      avatarIcon:
-      Color.lerp(avatarIcon, other.avatarIcon, t) ?? avatarIcon,
+      avatarIcon: Color.lerp(avatarIcon, other.avatarIcon, t) ?? avatarIcon,
       ovulation: Color.lerp(ovulation, other.ovulation, t) ?? ovulation,
       tintA: Color.lerp(tintA, other.tintA, t) ?? tintA,
       tintB: Color.lerp(tintB, other.tintB, t) ?? tintB,

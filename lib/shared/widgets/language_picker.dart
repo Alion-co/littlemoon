@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:little_moon/core/constants/app_radius.dart';
 import 'package:little_moon/core/localization/locale_provider.dart';
-import 'package:little_moon/core/theme/themes/moon_colors.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 import 'package:little_moon/l10n/generated/app_localizations.dart';
 
 /// نشان کوتاه هر زبان داخل دایره.
@@ -21,19 +22,17 @@ class LanguagePicker extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final moon = theme.extension<MoonColors>();
     final current = ref.watch(localeProvider).languageCode;
-    final subtitleColor = moon?.subtitle ?? theme.colorScheme.onSurfaceVariant;
 
     return Material(
-      color: theme.colorScheme.surface,
+      color: context.scheme.surface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadius.br20,
         side: BorderSide(color: theme.dividerColor.withValues(alpha: 0.6)),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => _showLanguageSheet(context),
+        onTap: () => showLanguageSheet(context),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           child: Row(
@@ -43,18 +42,18 @@ class LanguagePicker extends ConsumerWidget {
               Expanded(
                 child: Text(
                   appLanguages[current] ?? current,
-                  style: theme.textTheme.titleSmall?.copyWith(
+                  style: context.text.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
+                    color: context.scheme.onSurface,
                   ),
                 ),
               ),
-              Icon(Icons.language_rounded, size: 20, color: subtitleColor),
+              Icon(Icons.language_rounded, size: 20, color: context.subtitle),
               const SizedBox(width: 6),
               Icon(
                 Icons.keyboard_arrow_down_rounded,
                 size: 22,
-                color: subtitleColor,
+                color: context.subtitle,
               ),
             ],
           ),
@@ -64,15 +63,13 @@ class LanguagePicker extends ConsumerWidget {
   }
 }
 
-Future<void> _showLanguageSheet(BuildContext context) {
+Future<void> showLanguageSheet(BuildContext context) {
   return showModalBottomSheet<void>(
     context: context,
     useSafeArea: true,
     isScrollControlled: true,
     backgroundColor: Theme.of(context).colorScheme.surface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-    ),
+    shape: const RoundedRectangleBorder(borderRadius: AppRadius.sheetTop),
     builder: (sheetContext) => const _LanguageSheet(),
   );
 }
@@ -85,7 +82,7 @@ class _LanguageSheet extends ConsumerWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final current = ref.watch(localeProvider).languageCode;
-    final primary = theme.colorScheme.primary;
+    final primary = context.scheme.primary;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
@@ -97,15 +94,15 @@ class _LanguageSheet extends ConsumerWidget {
             height: 4,
             decoration: BoxDecoration(
               color: theme.dividerColor,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: AppRadius.br4,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             l10n.language,
-            style: theme.textTheme.titleMedium?.copyWith(
+            style: context.text.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
+              color: context.scheme.onSurface,
             ),
           ),
           const SizedBox(height: 16),
@@ -117,20 +114,16 @@ class _LanguageSheet extends ConsumerWidget {
                     ? primary.withValues(alpha: 0.10)
                     : theme.scaffoldBackgroundColor,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: AppRadius.br18,
                   side: BorderSide(
-                    color: entry.key == current
-                        ? primary
-                        : Colors.transparent,
+                    color: entry.key == current ? primary : Colors.transparent,
                     width: 1.4,
                   ),
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
                   onTap: () {
-                    ref
-                        .read(localeProvider.notifier)
-                        .setLanguage(entry.key);
+                    ref.read(localeProvider.notifier).setLanguage(entry.key);
                     Navigator.of(context).pop();
                   },
                   child: Padding(
@@ -148,13 +141,13 @@ class _LanguageSheet extends ConsumerWidget {
                         Expanded(
                           child: Text(
                             entry.value,
-                            style: theme.textTheme.titleSmall?.copyWith(
+                            style: context.text.titleSmall?.copyWith(
                               fontWeight: entry.key == current
                                   ? FontWeight.w700
                                   : FontWeight.w500,
                               color: entry.key == current
                                   ? primary
-                                  : theme.colorScheme.onSurface,
+                                  : context.scheme.onSurface,
                             ),
                           ),
                         ),
@@ -184,8 +177,7 @@ class _LanguageBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final primary = theme.colorScheme.primary;
+    final primary = context.scheme.primary;
 
     return Container(
       width: 38,
@@ -197,7 +189,7 @@ class _LanguageBadge extends StatelessWidget {
       ),
       child: Text(
         _languageBadges[code] ?? code.toUpperCase(),
-        style: theme.textTheme.labelLarge?.copyWith(
+        style: context.text.labelLarge?.copyWith(
           fontWeight: FontWeight.w700,
           color: selected ? Colors.white : primary,
           height: 1.1,

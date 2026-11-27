@@ -1,32 +1,31 @@
-import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    id("kotlin-android")
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-// Release signing key. The values live in android/key.properties, which is
-// ignored by git and must never be published.
+// android/key.properties (keyAlias, keyPassword, storeFile, storePassword).
+// storeFile is relative to android/app, e.g. storeFile=upload-keystore.jks
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
 val hasReleaseKey = keystorePropertiesFile.exists()
 if (hasReleaseKey) {
-    FileInputStream(keystorePropertiesFile).use { keystoreProperties.load(it) }
+    keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
 }
 
 android {
+    // The R class used by MoonWidgetProvider.kt is generated in this package.
     namespace = "com.littlemoon.app.little_moon"
     compileSdk = 36
-
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        // Required by flutter_local_notifications (scheduled notifications)
-        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
 
     defaultConfig {
@@ -54,6 +53,12 @@ android {
 
     buildTypes {
         release {
+            // Load R8 / ProGuard rules, including android/app/proguard-rules.pro
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+
             // Uses the real key when android/key.properties exists; otherwise
             // falls back to the debug key so the project still builds.
             signingConfig =
@@ -77,5 +82,10 @@ flutter {
 }
 
 dependencies {
+    implementation("androidx.window:window:1.3.0")
+    implementation("androidx.window:window-java:1.3.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+
+    // AppCompat themes for the fingerprint prompt (local_auth) on older Android
+    implementation("androidx.appcompat:appcompat:1.7.0")
 }

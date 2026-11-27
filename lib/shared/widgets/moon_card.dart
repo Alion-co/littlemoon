@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 
 /// کارت پایه‌ی برنامه: سطح سفید، گوشه‌ی گرد و حاشیه‌ی ظریف.
 class MoonCard extends StatelessWidget {
@@ -28,7 +29,7 @@ class MoonCard extends StatelessWidget {
       width: double.infinity,
       padding: padding,
       decoration: BoxDecoration(
-        color: color ?? theme.colorScheme.surface,
+        color: color ?? context.scheme.surface,
         borderRadius: borderRadius,
         border: bordered
             ? Border.all(color: theme.dividerColor.withValues(alpha: 0.6))
@@ -41,11 +42,7 @@ class MoonCard extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: borderRadius,
-        child: content,
-      ),
+      child: InkWell(onTap: onTap, borderRadius: borderRadius, child: content),
     );
   }
 }

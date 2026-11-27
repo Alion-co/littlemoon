@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:little_moon/core/constants/app_radius.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 
 /// دکمه‌ی کپسولی قابل انتخاب (هم‌شکل چیپ‌های صفحه‌ی خانه).
 class OptionPill extends StatelessWidget {
@@ -18,22 +20,22 @@ class OptionPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final primary = theme.colorScheme.primary;
+    final primary = context.scheme.primary;
     final iconData = icon;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: AppRadius.br30,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: selected
                 ? primary.withValues(alpha: 0.12)
-                : theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(30),
+                : context.scheme.surface,
+            borderRadius: AppRadius.br30,
             border: Border.all(
               color: selected
                   ? primary
@@ -53,8 +55,8 @@ class OptionPill extends StatelessWidget {
               ],
               Text(
                 label,
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: selected ? primary : theme.colorScheme.onSurface,
+                style: context.text.labelLarge?.copyWith(
+                  color: selected ? primary : context.scheme.onSurface,
                   fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                 ),
               ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:little_moon/core/theme/themes/moon_colors.dart';
+import 'package:little_moon/core/constants/app_radius.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 import 'package:little_moon/core/utils/digits.dart';
 import 'package:little_moon/domain/services/cycle_providers.dart';
 import 'package:little_moon/l10n/generated/app_localizations.dart';
@@ -11,8 +12,6 @@ class InsightsGrid extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final moon = theme.extension<MoonColors>();
     final l10n = AppLocalizations.of(context)!;
     final cycle = ref.watch(cycleProvider);
     final night = isNightTheme(context);
@@ -37,8 +36,8 @@ class InsightsGrid extends ConsumerWidget {
             icon: night ? Icons.nightlight_round : Icons.circle_outlined,
             title: l10n.averageCycle,
             value: context.n('${cycle.avgCycleLength} $days'),
-            backgroundColor: moon?.tintA ?? const Color(0xFFFCEEF4),
-            iconColor: theme.colorScheme.primary,
+            backgroundColor: context.tintA,
+            iconColor: context.scheme.primary,
           ),
         ),
         const SizedBox(width: 12),
@@ -47,8 +46,8 @@ class InsightsGrid extends ConsumerWidget {
             icon: night ? Icons.auto_awesome : Icons.waves_rounded,
             title: l10n.recentPattern,
             value: pattern,
-            backgroundColor: moon?.tintB ?? const Color(0xFFF3EEF9),
-            iconColor: theme.colorScheme.secondary,
+            backgroundColor: context.tintB,
+            iconColor: context.scheme.secondary,
           ),
         ),
       ],
@@ -73,18 +72,13 @@ class _InsightCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final moon = theme.extension<MoonColors>();
     final night = isNightTheme(context);
 
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: night
           ? homeCardDecoration(context, radius: 22)
-          : BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.circular(22),
-            ),
+          : BoxDecoration(color: backgroundColor, borderRadius: AppRadius.br22),
       child: Row(
         children: [
           // نشان گرد آیکون
@@ -115,9 +109,8 @@ class _InsightCard extends StatelessWidget {
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: moon?.subtitle ??
-                        theme.colorScheme.onSurfaceVariant,
+                  style: context.text.bodySmall?.copyWith(
+                    color: context.subtitle,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -127,9 +120,9 @@ class _InsightCard extends StatelessWidget {
                   child: Text(
                     value,
                     maxLines: 1,
-                    style: theme.textTheme.titleMedium?.copyWith(
+                    style: context.text.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onSurface,
+                      color: context.scheme.onSurface,
                     ),
                   ),
                 ),

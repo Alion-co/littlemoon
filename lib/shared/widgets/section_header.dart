@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:little_moon/core/theme/themes/moon_colors.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
@@ -15,8 +15,6 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final moon = theme.extension<MoonColors>();
     final trailingWidget = trailing;
     final subtitleText = subtitle;
 
@@ -29,18 +27,17 @@ class SectionHeader extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: theme.textTheme.titleMedium?.copyWith(
+                style: context.text.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurface,
+                  color: context.scheme.onSurface,
                 ),
               ),
               if (subtitleText != null) ...[
                 const SizedBox(height: 4),
                 Text(
                   subtitleText,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: moon?.subtitle ??
-                        theme.colorScheme.onSurfaceVariant,
+                  style: context.text.bodyMedium?.copyWith(
+                    color: context.subtitle,
                   ),
                 ),
               ],

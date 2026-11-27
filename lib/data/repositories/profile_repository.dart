@@ -2,28 +2,35 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../database/local_store.dart';
 import '../models/user_profile.dart';
+import 'data_slice.dart';
+import 'persisted_repository.dart';
 
-class ProfileRepository {
-  ProfileRepository(this._store);
+class ProfileRepository extends PersistedRepository<UserProfile> {
+  ProfileRepository(super.store);
 
-  static const storageKey = 'user_profile_v1';
+  @override
+  String get storageKey => 'user_profile_v1';
 
-  final LocalStore _store;
+  @override
+  String get backupKey => 'profile';
 
-  UserProfile load() {
-    final json = _store.getJson(storageKey);
-    return json == null ? const UserProfile() : UserProfile.fromJson(json);
-  }
+  @override
+  UserProfile get emptyValue => const UserProfile();
 
-  Future<void> save(UserProfile profile) =>
-      _store.setJson(storageKey, profile.toJson());
+  @override
+  Map<String, dynamic> encode(UserProfile value) => value.toJson();
+
+  @override
+  UserProfile decode(Object? raw) => raw is Map
+      ? UserProfile.fromJson(Map<String, dynamic>.from(raw))
+      : emptyValue;
 }
 
 final profileRepositoryProvider = Provider<ProfileRepository>(
   (ref) => ProfileRepository(ref.watch(localStoreProvider)),
 );
 
-class ProfileNotifier extends StateNotifier<UserProfile> {
+class ProfileNotifier extends StateNotifier<UserProfile> implements DataSlice {
   ProfileNotifier(this._repository) : super(_repository.load());
 
   final ProfileRepository _repository;
@@ -33,6 +40,23 @@ class ProfileNotifier extends StateNotifier<UserProfile> {
     await _repository.save(profile);
   }
 
+  // ---------- DataSlice ----------
+
+  @override
+  String get backupKey => _repository.backupKey;
+
+  @override
+  bool acceptsBackup(Object? raw) => true;
+
+  @override
+  Object? exportBackup() => _repository.toBackup(state);
+
+  /// بعد از بازیابی، کاربر نباید دوباره وارد معرفی (onboarding) بشه.
+  @override
+  Future<void> importBackup(Object? raw) =>
+      save(_repository.fromBackup(raw).copyWith(onboardingDone: true));
+
+  @override
   Future<void> reset() => save(const UserProfile());
 }
 

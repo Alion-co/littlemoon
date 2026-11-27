@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/constants/app_radius.dart';
 
 class PhaseBadge extends StatelessWidget {
@@ -12,7 +13,7 @@ class PhaseBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
         color: const Color(0xFFEADDF8),
-        borderRadius: BorderRadius.circular(AppRadius.xl),
+        borderRadius: AppRadius.br30,
       ),
       child: Text(
         title,

@@ -19,7 +19,8 @@ class JalaliDate {
     final gd = date.day;
     final gy2 = gm > 2 ? gy + 1 : gy;
 
-    var days = 355666 +
+    var days =
+        355666 +
         365 * gy +
         (gy2 + 3) ~/ 4 -
         (gy2 + 99) ~/ 100 +
@@ -55,7 +56,8 @@ class JalaliDate {
   DateTime toDateTime() {
     final jy = year + 1595;
 
-    var days = -355668 +
+    var days =
+        -355668 +
         365 * jy +
         (jy ~/ 33) * 8 +
         (jy % 33 + 3) ~/ 4 +

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:little_moon/core/constants/app_radius.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
+import 'package:little_moon/core/utils/haptics.dart';
 import 'package:little_moon/data/models/daily_log.dart';
 import 'package:little_moon/data/repositories/log_repository.dart';
 import 'package:little_moon/domain/services/cycle_providers.dart';
@@ -12,14 +15,13 @@ class PeriodQuickAction extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final today = ref.watch(todayProvider);
     final log = ref.watch(todayLogProvider);
     final cycle = ref.watch(cycleProvider);
 
     final isPeriodToday = log?.isPeriodDay ?? false;
-    final primary = theme.colorScheme.primary;
+    final primary = context.scheme.primary;
     final night = isNightTheme(context);
     final idleColor = night ? Colors.white : primary;
 
@@ -33,6 +35,7 @@ class PeriodQuickAction extends ConsumerWidget {
     }
 
     Future<void> toggle() async {
+      Haptics.success();
       final current = log ?? DailyLog(date: today);
       final next = current.withFlow(isPeriodToday ? null : FlowLevel.medium);
       await ref.read(logsProvider.notifier).save(next);
@@ -42,10 +45,10 @@ class PeriodQuickAction extends ConsumerWidget {
       color: isPeriodToday
           ? primary
           : primary.withValues(alpha: night ? 0.28 : 0.10),
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: AppRadius.br18,
       child: InkWell(
         onTap: toggle,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: AppRadius.br18,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
           child: Row(
@@ -61,7 +64,7 @@ class PeriodQuickAction extends ConsumerWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: theme.textTheme.labelLarge?.copyWith(
+                  style: context.text.labelLarge?.copyWith(
                     color: isPeriodToday ? Colors.white : idleColor,
                     fontWeight: FontWeight.w600,
                   ),
@@ -70,7 +73,7 @@ class PeriodQuickAction extends ConsumerWidget {
               if (isPeriodToday)
                 Text(
                   l10n.undo,
-                  style: theme.textTheme.labelMedium?.copyWith(
+                  style: context.text.labelMedium?.copyWith(
                     color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),

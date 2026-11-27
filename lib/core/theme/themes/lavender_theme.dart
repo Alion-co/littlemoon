@@ -20,13 +20,13 @@ class LavenderTheme {
   );
 
   static ThemeData get theme => buildAppTheme(
-        brightness: Brightness.light,
-        primary: const Color(0xFF8B5CF6),
-        secondary: const Color(0xFFEC6FA9),
-        background: const Color(0xFFF7F5FD),
-        surface: const Color(0xFFFFFFFF),
-        onSurface: const Color(0xFF241F35),
-        outline: const Color(0xFFE3DCF5),
-        colors: colors,
-      );
+    brightness: Brightness.light,
+    primary: const Color(0xFF8B5CF6),
+    secondary: const Color(0xFFEC6FA9),
+    background: const Color(0xFFF7F5FD),
+    surface: const Color(0xFFFFFFFF),
+    onSurface: const Color(0xFF241F35),
+    outline: const Color(0xFFE3DCF5),
+    colors: colors,
+  );
 }

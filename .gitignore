@@ -46,3 +46,21 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Little Moon
+tool/check_log.txt
+pubspec.yaml.bak
+/build/test_reports/
+
+# Build outputs and local files
+android/app/build/
+android/build/
+android/.gradle/
+*.zip
+*.bak
+*.apk
+*.aab
+android/local.properties
+android/key.properties
+*.jks
+*.keystore

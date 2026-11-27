@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:little_moon/core/theme/themes/moon_colors.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 import 'package:little_moon/domain/engine/cycle_engine.dart';
 
 /// رنگ نشانگر هر نوع روز (پریود، باروری، تخمک‌گذاری).
 Color? dayKindColor(BuildContext context, DayKind kind) {
-  final theme = Theme.of(context);
-  final moon = theme.extension<MoonColors>();
-
   switch (kind) {
     case DayKind.period:
     case DayKind.predictedPeriod:
-      return theme.colorScheme.primary;
+      return context.scheme.primary;
     case DayKind.fertile:
-      return theme.colorScheme.secondary;
+      return context.scheme.secondary;
     case DayKind.ovulation:
-      return moon?.ovulation ?? const Color(0xFF7B4DB3);
+      return context.moon?.ovulation ?? const Color(0xFF7B4DB3);
     case DayKind.none:
       return null;
   }

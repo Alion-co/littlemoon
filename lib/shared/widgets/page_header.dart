@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 
 /// هدر صفحه‌ها: عنوان وسط‌چین، دکمه‌ی برگشت به سبک iOS در ابتدا
 /// و یک اکشن اختیاری در انتها.
@@ -18,7 +19,6 @@ class PageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final back = onBack;
     final action = trailing;
 
@@ -38,9 +38,9 @@ class PageHeader extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: theme.textTheme.titleLarge?.copyWith(
+              style: context.text.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onSurface,
+                color: context.scheme.onSurface,
               ),
             ),
           ),
@@ -51,11 +51,10 @@ class PageHeader extends StatelessWidget {
                 onPressed: back,
                 // این آیکون خودش در راست‌به‌چپ قرینه می‌شه
                 icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-                color: theme.colorScheme.onSurface,
+                color: context.scheme.onSurface,
               ),
             ),
-          if (action != null)
-            PositionedDirectional(end: -8, child: action),
+          if (action != null) PositionedDirectional(end: -8, child: action),
         ],
       ),
     );

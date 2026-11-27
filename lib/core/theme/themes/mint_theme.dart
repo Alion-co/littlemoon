@@ -20,13 +20,13 @@ class MintTheme {
   );
 
   static ThemeData get theme => buildAppTheme(
-        brightness: Brightness.light,
-        primary: const Color(0xFF2E9E78),
-        secondary: const Color(0xFFF0895C),
-        background: const Color(0xFFF4FAF6),
-        surface: const Color(0xFFFFFFFF),
-        onSurface: const Color(0xFF1B3229),
-        outline: const Color(0xFFD5EBDE),
-        colors: colors,
-      );
+    brightness: Brightness.light,
+    primary: const Color(0xFF2E9E78),
+    secondary: const Color(0xFFF0895C),
+    background: const Color(0xFFF4FAF6),
+    surface: const Color(0xFFFFFFFF),
+    onSurface: const Color(0xFF1B3229),
+    outline: const Color(0xFFD5EBDE),
+    colors: colors,
+  );
 }

@@ -20,13 +20,13 @@ class MidnightTheme {
   );
 
   static ThemeData get theme => buildAppTheme(
-        brightness: Brightness.dark,
-        primary: const Color(0xFFE0669B),
-        secondary: const Color(0xFFA594F0),
-        background: const Color(0xFF14132B),
-        surface: const Color(0xFF201F3C),
-        onSurface: const Color(0xFFF1EEF8),
-        outline: const Color(0xFF37345A),
-        colors: colors,
-      );
+    brightness: Brightness.dark,
+    primary: const Color(0xFFE0669B),
+    secondary: const Color(0xFFA594F0),
+    background: const Color(0xFF14132B),
+    surface: const Color(0xFF201F3C),
+    onSurface: const Color(0xFFF1EEF8),
+    outline: const Color(0xFF37345A),
+    colors: colors,
+  );
 }

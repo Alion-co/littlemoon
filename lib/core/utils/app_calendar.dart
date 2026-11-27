@@ -66,8 +66,7 @@ class AppCalendar {
   bool get _saturdayFirst => isJalali || lang == 'fa' || lang == 'ar';
 
   /// اولین روز هفته به فرمت [DateTime.weekday].
-  int get firstWeekday =>
-      _saturdayFirst ? DateTime.saturday : DateTime.monday;
+  int get firstWeekday => _saturdayFirst ? DateTime.saturday : DateTime.monday;
 
   /// هفت روز هفته به ترتیب نمایش.
   List<int> get weekdayOrder =>

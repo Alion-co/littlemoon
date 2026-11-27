@@ -1,60 +1,67 @@
-# 🌙 Little Moon
+<div align="center">
 
-**A private, free and fully offline period tracker for girls and women.**
+<img src="docs/readme/hero.png" alt="Little Moon | رهگیری خصوصی و آفلاین چرخه">
 
-Little Moon predicts your cycle from what you log yourself and keeps everything on your own phone. No account, no server, no ads, and nothing is ever sent anywhere. It is free and will stay free.
+</div>
 
-## Screenshots
+<div dir="rtl">
+
+Little Moon پریود بعدی، تخمک‌گذاری و روزهای باروری رو از روی ثبت‌های خودت پیش‌بینی می‌کنه.
+همه‌ی اطلاعات فقط روی گوشی خودت می‌مونه: بدون حساب کاربری، بدون سرور و بدون تبلیغ.
+
+## دریافت
+
+</div>
 
 <p align="center">
-  <img src="docs/screenshots/home.jpg" width="230" alt="Home">
-  <img src="docs/screenshots/calendar.jpg" width="230" alt="Calendar">
-  <img src="docs/screenshots/insights.jpg" width="230" alt="Cycle insights">
+  <a href="https://cafebazaar.ir/app/ir.littlemoon"><img src="docs/buttons/bazaar.png" width="230" alt="دریافت از کافه‌بازار"></a>
+  <a href="https://myket.ir/app/ir.littlemoon"><img src="docs/buttons/myket.png" width="230" alt="دریافت از مایکت"></a>
+  <br>
+  <a href="https://github.com/Alion-co/littlemoon/releases/latest"><img src="docs/buttons/apk.png" width="230" alt="دانلود مستقیم APK"></a>
+  <a href="https://alion-co.github.io/littlemoon/"><img src="docs/buttons/web.png" width="230" alt="نسخه‌ی وب"></a>
 </p>
+
+<div dir="rtl">
+
+## نگاهی به اپ
+
+</div>
+
 <p align="center">
-  <img src="docs/screenshots/health.jpg" width="230" alt="Health">
-  <img src="docs/screenshots/profile.jpg" width="230" alt="Profile">
-  <img src="docs/screenshots/settings.jpg" width="230" alt="Settings">
+  <img src="docs/screenshots/home.jpg" width="135" alt="خانه">
+  <img src="docs/screenshots/calendar.jpg" width="135" alt="تقویم">
+  <img src="docs/screenshots/insights.jpg" width="135" alt="تحلیل">
+  <img src="docs/screenshots/health.jpg" width="135" alt="سلامت">
+  <img src="docs/screenshots/profile.jpg" width="135" alt="پروفایل">
+  <img src="docs/screenshots/settings.jpg" width="135" alt="تنظیمات">
 </p>
 
-## Features
+<div dir="rtl">
 
-- **Cycle predictions** — next period, ovulation day and fertile window, estimated from the average of your recent logged cycles
-- **Daily log** — flow, mood, pain, energy, sleep, symptoms and notes
-- **Calendar** — month and week views with period, predicted, fertile and ovulation markers
-- **Cycle insights** — average cycle and period length, regularity, cycle history, most frequent symptoms and mood summary
-- **Health** — tips for your current phase, water, weight, body temperature and sleep tracking
-- **Reminders** — local phone notifications for upcoming period, fertile window, ovulation and the daily log
-- **Shamsi (Solar Hijri) and Gregorian calendars**
-- **5 languages** — Persian, English, Arabic, Spanish and Turkish, with full right-to-left support
-- **8 themes** — six light themes and two dark themes with a night-sky home screen
-- **Avatars** — five built-in avatars for your profile
-- **Backup and restore** — export all your data as plain text and restore it any time
+## امکانات
 
-## Privacy
+</div>
 
-All data is stored locally on the device. The app works without an internet connection and has no analytics, no tracking and no backend.
+<p align="center">
+  <img src="docs/readme/feat.png" alt="پیش‌بینی چرخه، ثبت سریع روزانه، تقویم شمسی و میلادی، تحلیل و الگوها، سلامت و فاز، یادآور و ویجت، گزارش پزشک، قفل پین و اثرانگشت، پشتیبان‌گیری">
+</p>
 
-## Tech stack
+<div dir="rtl">
 
-- [Flutter](https://flutter.dev) and Dart
-- [Riverpod](https://riverpod.dev) for state management
-- [go_router](https://pub.dev/packages/go_router) for navigation
-- [shared_preferences](https://pub.dev/packages/shared_preferences) for local storage
-- [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications) for offline reminders
+۵ زبان با پشتیبانی کامل راست‌به‌چپ (فارسی، English، العربية، Español، Türkçe) · ۸ تم روشن و تیره · تقویم شمسی و میلادی
 
-## Project structure
+## حریم خصوصی
 
-```
-lib/
-├── core/       # theme, localization, routing, date and calendar utilities
-├── data/       # models, local storage, repositories
-├── domain/     # cycle engine, reminders, notifications, backup
-├── features/   # home, calendar, insights, health, profile, settings, onboarding, about
-└── shared/     # reusable widgets
-```
+همه‌ی داده‌ها روی خود دستگاه ذخیره می‌شن. اپ بدون اینترنت کار می‌کنه و هیچ ابزار تحلیل، ردیابی یا سروری نداره.
+اعلان‌ها متن خنثی دارن و روی صفحه‌ی قفل پنهان می‌شن، و می‌تونی اپ رو با پین ۴ رقمی یا اثرانگشت قفل کنی.
 
-## Getting started
+## مشارکت
+
+مشکل‌ها و پیشنهادها رو در [Issues](https://github.com/Alion-co/littlemoon/issues) بنویس و Pull Request هم خوش‌آمده.
+ترجمه‌ها در پوشه‌ی `l10n/` و به‌صورت فایل `.arb` هستن، پس بهتر کردن یا اضافه کردن یک زبان به دست‌زدن به کد نیاز نداره.
+
+<details>
+<summary>برای توسعه‌دهنده‌ها</summary>
 
 ```bash
 git clone https://github.com/Alion-co/littlemoon.git
@@ -63,24 +70,47 @@ flutter pub get
 flutter run
 ```
 
-Requires Flutter 3.38 or newer.
+به Flutter نسخه‌ی ۳.۳۸ یا بالاتر نیاز داره.
 
-## Contributing
+- [Flutter](https://flutter.dev) و Dart
+- [Riverpod](https://riverpod.dev) برای مدیریت وضعیت و [go_router](https://pub.dev/packages/go_router) برای مسیریابی
+- [shared_preferences](https://pub.dev/packages/shared_preferences) برای ذخیره‌ی محلی
+- [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications) برای یادآورهای آفلاین
+- [local_auth](https://pub.dev/packages/local_auth) برای اثرانگشت و [home_widget](https://pub.dev/packages/home_widget) برای ویجت اندروید
+- [pdf](https://pub.dev/packages/pdf) و [printing](https://pub.dev/packages/printing) برای گزارش پزشک
 
-Issues and pull requests are welcome. Translations live in the `l10n/` folder as `.arb` files, so improving or adding a language does not require touching the code.
+```
+lib/
+├── core/       # تم، بومی‌سازی، مسیریابی، ابزار تاریخ و تقویم
+├── data/       # مدل‌ها، ذخیره‌ی محلی، repositoryها
+├── domain/     # موتور چرخه، یادآورها، اعلان‌ها، پشتیبان‌گیری
+├── features/   # خانه، تقویم، تحلیل، سلامت، پروفایل، تنظیمات، شروع، درباره
+└── shared/     # ویجت‌های مشترک
+```
 
-## Disclaimer
+</details>
 
-Predictions are estimates based on the data you log. Little Moon is not a medical device, does not give medical advice and must not be used as a method of contraception.
+## هشدار
 
-## License
+پیش‌بینی‌ها تخمین‌هایی از روی داده‌هایی هستن که خودت ثبت می‌کنی. Little Moon دستگاه پزشکی نیست، توصیه‌ی پزشکی نمی‌ده و نباید برای جلوگیری از بارداری استفاده بشه.
 
-Little Moon is free to use, study, modify and share for any **noncommercial** purpose under the [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0). Selling it or using it commercially is not allowed. See [LICENSE](LICENSE).
+## مجوز
 
-The bundled Vazirmatn font is licensed separately under the SIL Open Font License 1.1.
+Little Moon برای هر کاری که **غیرتجاری** باشه آزاده: استفاده، مطالعه، تغییر و اشتراک‌گذاری، با مجوز [PolyForm Noncommercial 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0).
+فروش و هر نوع استفاده‌ی تجاری مجاز نیست (جزئیات در فایل [`LICENSE`](LICENSE)).
+فونت وزیرمتن جداگانه با مجوز SIL Open Font License 1.1 منتشر شده.
 
-## Credits
+</div>
 
-Made by **ALION** · Instagram: [@alion.inc](https://instagram.com/alion.inc)
+<p align="center">
+  <a href="https://instagram.com/alion.inc"><img src="docs/readme/credit.png" width="300" alt="طراحی و ساخت: Alion"></a>
+</p>
 
-*Dedicated to my little moon* 🌙
+<details>
+<summary>English</summary>
+
+**Little Moon** is a private, free and fully offline period tracker. It predicts your next period, ovulation and fertile window from what you log, and keeps everything on your phone: no account, no server, no ads. Five languages with full right-to-left support, Shamsi and Gregorian calendars, eight themes, PIN and fingerprint lock, backup files and a PDF report for your doctor.
+
+Download from [Cafe Bazaar](https://cafebazaar.ir/app/ir.littlemoon), [Myket](https://myket.ir/app/ir.littlemoon) or the [latest release](https://github.com/Alion-co/littlemoon/releases/latest). Free for noncommercial use under the PolyForm Noncommercial License 1.0.0. Not a medical device and not a method of contraception.
+
+</details>

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:little_moon/core/theme/themes/moon_colors.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 import 'package:little_moon/l10n/generated/app_localizations.dart';
 import 'package:little_moon/shared/widgets/glass.dart';
 import 'package:little_moon/shared/widgets/user_avatar.dart';
@@ -33,17 +33,18 @@ class AppHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final moon = theme.extension<MoonColors>()!;
+    final moon = context.moon!;
     final l10n = AppLocalizations.of(context)!;
 
     // تم شب: تاریخ با رنگ یاسی روشن روی آسمان
     final dateColor = isNightTheme(context)
-        ? (Color.lerp(theme.colorScheme.secondary, Colors.white, 0.35) ??
-            moon.subtitle)
+        ? (Color.lerp(context.scheme.secondary, Colors.white, 0.35) ??
+              moon.subtitle)
         : moon.subtitle;
 
-    final separator =
-        (l10n.localeName == 'fa' || l10n.localeName == 'ar') ? '،' : ',';
+    final separator = (l10n.localeName == 'fa' || l10n.localeName == 'ar')
+        ? '،'
+        : ',';
     final hello = greeting ?? l10n.homeGreeting;
     final title = userName.trim().isEmpty
         ? hello
@@ -59,17 +60,15 @@ class AppHeader extends StatelessWidget {
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.titleLarge?.copyWith(
+                style: context.text.titleLarge?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurface,
+                  color: context.scheme.onSurface,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 dateText,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: dateColor,
-                ),
+                style: context.text.bodyMedium?.copyWith(color: dateColor),
               ),
             ],
           ),
@@ -83,7 +82,7 @@ class AppHeader extends StatelessWidget {
                 hasReminders
                     ? Icons.notifications_active_outlined
                     : Icons.notifications_none_rounded,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.85),
+                color: context.scheme.onSurface.withValues(alpha: 0.85),
               ),
             ),
             if (hasReminders)
@@ -95,7 +94,7 @@ class AppHeader extends StatelessWidget {
                     width: 9,
                     height: 9,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary,
+                      color: context.scheme.primary,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: theme.scaffoldBackgroundColor,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 
 /// تم‌های تیره «حالت شب» دارن: پس‌زمینه‌ی آسمان شب و کارت‌های شیشه‌ای.
 bool isNightTheme(BuildContext context) =>
@@ -18,7 +19,7 @@ BoxDecoration homeCardDecoration(BuildContext context, {double radius = 24}) {
   }
 
   return BoxDecoration(
-    color: theme.colorScheme.surface,
+    color: context.scheme.surface,
     borderRadius: BorderRadius.circular(radius),
     border: Border.all(color: theme.dividerColor.withValues(alpha: 0.6)),
   );

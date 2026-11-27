@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 import 'package:little_moon/core/utils/digits.dart';
 
 /// انتخاب عدد با دکمه‌های کم/زیاد.
@@ -20,11 +21,10 @@ class NumberStepper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final unitText = unit;
 
     Widget button(IconData icon, bool enabled, VoidCallback onTap) {
-      final color = theme.colorScheme.primary;
+      final color = context.scheme.primary;
       return Material(
         color: color.withValues(alpha: enabled ? 0.12 : 0.05),
         shape: const CircleBorder(),
@@ -54,16 +54,16 @@ class NumberStepper extends StatelessWidget {
             children: [
               Text(
                 context.n(value),
-                style: theme.textTheme.headlineMedium?.copyWith(
+                style: context.text.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary,
+                  color: context.scheme.primary,
                 ),
               ),
               if (unitText != null)
                 Text(
                   unitText,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  style: context.text.bodySmall?.copyWith(
+                    color: context.scheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
             ],

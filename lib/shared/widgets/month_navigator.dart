@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 
 /// عنوان + دکمه‌های قبل/بعد.
 ///
@@ -18,27 +19,25 @@ class MonthNavigator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton(
           onPressed: onPrevious,
           icon: const Icon(Icons.chevron_left_rounded),
-          color: theme.colorScheme.onSurface,
+          color: context.scheme.onSurface,
         ),
         Text(
           label,
-          style: theme.textTheme.titleMedium?.copyWith(
+          style: context.text.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
-            color: theme.colorScheme.onSurface,
+            color: context.scheme.onSurface,
           ),
         ),
         IconButton(
           onPressed: onNext,
           icon: const Icon(Icons.chevron_right_rounded),
-          color: theme.colorScheme.onSurface,
+          color: context.scheme.onSurface,
         ),
       ],
     );

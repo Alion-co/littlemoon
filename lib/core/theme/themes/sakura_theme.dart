@@ -20,13 +20,13 @@ class SakuraTheme {
   );
 
   static ThemeData get theme => buildAppTheme(
-        brightness: Brightness.light,
-        primary: const Color(0xFFE5668A),
-        secondary: const Color(0xFFF2994A),
-        background: const Color(0xFFFFF7F8),
-        surface: const Color(0xFFFFFFFF),
-        onSurface: const Color(0xFF3A2A30),
-        outline: const Color(0xFFF5DCE3),
-        colors: colors,
-      );
+    brightness: Brightness.light,
+    primary: const Color(0xFFE5668A),
+    secondary: const Color(0xFFF2994A),
+    background: const Color(0xFFFFF7F8),
+    surface: const Color(0xFFFFFFFF),
+    onSurface: const Color(0xFF3A2A30),
+    outline: const Color(0xFFF5DCE3),
+    colors: colors,
+  );
 }

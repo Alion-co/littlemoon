@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:little_moon/core/constants/app_radius.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 
 class ToggleOption<T> {
   final T value;
@@ -28,8 +30,8 @@ class SegmentedToggle<T> extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        color: context.scheme.surface,
+        borderRadius: AppRadius.br20,
         border: Border.all(color: theme.dividerColor.withValues(alpha: 0.6)),
       ),
       child: Row(
@@ -64,9 +66,9 @@ class _Segment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final color =
-        selected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface;
+    final color = selected
+        ? context.scheme.onPrimary
+        : context.scheme.onSurface;
     final iconData = icon;
 
     return GestureDetector(
@@ -77,8 +79,8 @@ class _Segment extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 8),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: selected ? theme.colorScheme.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
+          color: selected ? context.scheme.primary : Colors.transparent,
+          borderRadius: AppRadius.br16,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -92,7 +94,7 @@ class _Segment extends StatelessWidget {
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.labelLarge?.copyWith(
+                style: context.text.labelLarge?.copyWith(
                   color: color,
                   fontWeight: FontWeight.w600,
                 ),

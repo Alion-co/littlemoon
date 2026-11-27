@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:little_moon/core/constants/app_radius.dart';
+import 'package:little_moon/core/theme/theme_context.dart';
 import 'package:little_moon/core/utils/app_calendar.dart';
 import 'package:little_moon/domain/engine/cycle_engine.dart';
 
@@ -19,9 +21,7 @@ Future<DateTime?> showMoonDatePicker({
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: Theme.of(context).colorScheme.surface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-    ),
+    shape: const RoundedRectangleBorder(borderRadius: AppRadius.sheetTop),
     builder: (sheetContext) => _DatePickerSheet(
       calendar: calendar,
       initialDate: initialDate,
@@ -60,7 +60,8 @@ class _DatePickerSheetState extends State<_DatePickerSheet> {
     final calendar = widget.calendar;
     final limit = widget.maxDate;
 
-    final canGoNext = limit == null ||
+    final canGoNext =
+        limit == null ||
         !calendar.firstDayOf(calendar.next(_month)).isAfter(limit);
 
     return SingleChildScrollView(
@@ -73,15 +74,15 @@ class _DatePickerSheetState extends State<_DatePickerSheet> {
             height: 4,
             decoration: BoxDecoration(
               color: theme.dividerColor,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: AppRadius.br4,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             widget.title,
-            style: theme.textTheme.titleMedium?.copyWith(
+            style: context.text.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
+              color: context.scheme.onSurface,
             ),
           ),
           const SizedBox(height: 8),

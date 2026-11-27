@@ -1,197 +1,20 @@
+import 'dart:math' as math;
+
 import '../../core/utils/day_utils.dart';
 import '../../core/utils/math_utils.dart';
+import 'bbt_analyzer.dart';
+import 'cycle_forecast.dart';
+import 'cycle_models.dart';
+import 'cycle_snapshot.dart';
+import 'cycle_stats.dart';
+import 'day_marks.dart';
+import 'luteal_learning.dart';
+import 'period_detection.dart';
 
-enum CyclePhase { menstrual, follicular, ovulation, luteal }
-
-enum DayKind { none, period, predictedPeriod, fertile, ovulation }
-
-enum CycleRegularity { unknown, regular, irregular }
-
-/// یک دوره‌ی پریود ثبت‌شده (از اولین تا آخرین روز خونریزی).
-class PeriodRange {
-  final DateTime start;
-  final DateTime end;
-
-  const PeriodRange(this.start, this.end);
-
-  int get length => daysBetween(start, end) + 1;
-}
-
-/// یک چرخه‌ی کامل: از شروع یک پریود تا شروع پریود بعدی.
-class CycleRecord {
-  final DateTime start;
-  final int length;
-  final int periodLength;
-
-  /// چرخه‌های خیلی کوتاه/بلند (معمولاً به‌خاطر ثبت‌نشدن یک پریود)
-  /// در میانگین‌گیری حساب نمی‌شن.
-  final bool valid;
-
-  const CycleRecord({
-    required this.start,
-    required this.length,
-    required this.periodLength,
-    required this.valid,
-  });
-}
-
-/// وضعیت محاسبه‌شده‌ی چرخه در یک روز مشخص.
-class CycleSnapshot {
-  final DateTime today;
-  final bool hasData;
-
-  final List<PeriodRange> periods;
-  final List<CycleRecord> cycles;
-
-  /// طول چرخه‌های معتبرِ اخیر که مبنای میانگین بودن (حداکثر ۶ تا).
-  final List<int> recentCycleLengths;
-
-  final int avgCycleLength;
-  final int avgPeriodLength;
-  final int lutealLength;
-  final int? minCycleLength;
-  final int? maxCycleLength;
-  final CycleRegularity regularity;
-
-  final DateTime? lastPeriodStart;
-
-  /// شروع پیش‌بینی‌شده‌ی پریود بعدی (ممکنه در گذشته باشه = تأخیر).
-  final DateTime? nextPeriodStart;
-
-  /// منفی یعنی پریود عقب افتاده.
-  final int? daysUntilNextPeriod;
-
-  final int? cycleDay;
-  final CyclePhase? phase;
-  final bool isPeriodToday;
-  final bool isPeriodOngoing;
-
-  final DateTime? nextOvulation;
-  final DateTime? fertileStart;
-  final DateTime? fertileEnd;
-
-  /// شروع پریودهای پیش‌بینی‌شده‌ی آینده.
-  final List<DateTime> upcomingPeriods;
-
-  final Set<int> periodDaySet;
-  final Set<int> predictedDaySet;
-  final Set<int> fertileDaySet;
-  final Set<int> ovulationDaySet;
-
-  const CycleSnapshot({
-    required this.today,
-    required this.hasData,
-    required this.periods,
-    required this.cycles,
-    required this.recentCycleLengths,
-    required this.avgCycleLength,
-    required this.avgPeriodLength,
-    required this.lutealLength,
-    required this.minCycleLength,
-    required this.maxCycleLength,
-    required this.regularity,
-    required this.lastPeriodStart,
-    required this.nextPeriodStart,
-    required this.daysUntilNextPeriod,
-    required this.cycleDay,
-    required this.phase,
-    required this.isPeriodToday,
-    required this.isPeriodOngoing,
-    required this.nextOvulation,
-    required this.fertileStart,
-    required this.fertileEnd,
-    required this.upcomingPeriods,
-    required this.periodDaySet,
-    required this.predictedDaySet,
-    required this.fertileDaySet,
-    required this.ovulationDaySet,
-  });
-
-  factory CycleSnapshot.empty({
-    required DateTime today,
-    int cycleLength = 28,
-    int periodLength = 5,
-    int lutealLength = 14,
-  }) {
-    return CycleSnapshot(
-      today: dayOnly(today),
-      hasData: false,
-      periods: const [],
-      cycles: const [],
-      recentCycleLengths: const [],
-      avgCycleLength: cycleLength,
-      avgPeriodLength: periodLength,
-      lutealLength: lutealLength,
-      minCycleLength: null,
-      maxCycleLength: null,
-      regularity: CycleRegularity.unknown,
-      lastPeriodStart: null,
-      nextPeriodStart: null,
-      daysUntilNextPeriod: null,
-      cycleDay: null,
-      phase: null,
-      isPeriodToday: false,
-      isPeriodOngoing: false,
-      nextOvulation: null,
-      fertileStart: null,
-      fertileEnd: null,
-      upcomingPeriods: const [],
-      periodDaySet: const <int>{},
-      predictedDaySet: const <int>{},
-      fertileDaySet: const <int>{},
-      ovulationDaySet: const <int>{},
-    );
-  }
-
-  /// تعداد روزهای تأخیر پریود (۰ اگه تأخیری نیست).
-  int get daysLate {
-    final days = daysUntilNextPeriod;
-    return (days != null && days < 0) ? -days : 0;
-  }
-
-  /// پیشرفت چرخه‌ی فعلی بین ۰ و ۱.
-  double get progress {
-    final day = cycleDay;
-    if (day == null || avgCycleLength <= 0) return 0;
-    return clampDouble(day / avgCycleLength, 0, 1);
-  }
-
-  bool get isInFertileWindow {
-    final key = epochDay(today);
-    return !periodDaySet.contains(key) &&
-        (fertileDaySet.contains(key) || ovulationDaySet.contains(key));
-  }
-
-  /// نوع یک روز برای نمایش در تقویم.
-  DayKind kindOf(DateTime date) {
-    final key = epochDay(date);
-    if (periodDaySet.contains(key)) return DayKind.period;
-    if (predictedDaySet.contains(key)) return DayKind.predictedPeriod;
-    if (ovulationDaySet.contains(key)) return DayKind.ovulation;
-    if (fertileDaySet.contains(key)) return DayKind.fertile;
-    return DayKind.none;
-  }
-
-  /// شماره‌ی روز چرخه برای یک تاریخ دلخواه (اگه قابل محاسبه باشه).
-  int? cycleDayOf(DateTime date) {
-    final day = dayOnly(date);
-    PeriodRange? owner;
-    for (final period in periods) {
-      if (!period.start.isAfter(day)) owner = period;
-    }
-    if (owner == null) return null;
-
-    final isLast = identical(owner, periods.last);
-    if (isLast && upcomingPeriods.isNotEmpty) {
-      final next = upcomingPeriods.first;
-      if (!day.isBefore(next) && day.isAfter(today)) {
-        // روز آینده‌ای که در چرخه‌های پیش‌بینی‌شده‌ی بعدی می‌افته
-        return daysBetween(next, day) % avgCycleLength + 1;
-      }
-    }
-    return daysBetween(owner.start, day) + 1;
-  }
-}
+export 'bbt_analyzer.dart';
+export 'cycle_models.dart';
+export 'cycle_snapshot.dart';
+export 'cycle_snapshot_queries.dart';
 
 /// موتور محاسبه‌ی چرخه — کاملاً خالص (بدون وابستگی به Flutter یا حافظه).
 ///
@@ -212,7 +35,37 @@ abstract final class CycleEngine {
   /// اختلاف کوتاه‌ترین و بلندترین چرخه تا این مقدار «منظم» حساب می‌شه.
   static const regularSpread = 7;
 
-  static const _futureCycles = 12;
+  static const futureCycles = 12;
+
+  /// بازه‌ی پیش‌بینی (± روز) وقتی هنوز دو چرخه‌ی کامل ثبت نشده.
+  static const defaultSpread = 3;
+
+  /// بازه‌ی پیش‌بینی هیچ‌وقت از این باریک‌تر یا پهن‌تر نمی‌شه.
+  static const minSpread = 1;
+  static const maxSpread = 7;
+
+  /// فاز لوتئالِ یادگرفته‌شده باید توی این بازه باشه (هم‌خوان با پروفایل).
+  static const minObservedLuteal = 9;
+  static const maxObservedLuteal = 18;
+
+  /// حداقل تعداد چرخه‌ی تأییدشده با دما تا فاز لوتئال شخصی به کار بیفته.
+  static const minLutealSamples = 2;
+
+  /// بعد از تأیید تخمک‌گذاری با دما، بازه‌ی پیش‌بینی از این پهن‌تر نمی‌شه.
+  static const bbtRefinedMaxSpread = 2;
+
+  /// بیشتر از این تعداد روز تأخیر یعنی «تأخیر جدی».
+  static const veryLateDays = 7;
+
+  /// میانگین چرخه کمتر از این → «چرخه‌های کوتاه»، بیشتر از [longCycleDays]
+  /// → «چرخه‌های بلند» (بازه‌ی رایج ۲۱ تا ۳۵ روز).
+  static const shortCycleDays = 21;
+  static const longCycleDays = 35;
+
+  static int spreadOf(List<int> lengths) => CycleStats.spreadOf(lengths);
+
+  static PredictionConfidence confidenceOf(List<int> lengths, int spread) =>
+      CycleStats.confidenceOf(lengths, spread);
 
   static CycleSnapshot compute({
     required Iterable<DateTime> periodDays,
@@ -220,9 +73,11 @@ abstract final class CycleEngine {
     int defaultCycleLength = 28,
     int defaultPeriodLength = 5,
     int lutealLength = 14,
+    Iterable<MapEntry<DateTime, double>> temperatures = const [],
+    Iterable<DateTime> unusualCycleStarts = const [],
   }) {
     final now = dayOnly(today);
-    final luteal = clampInt(lutealLength, 9, 18);
+    final profileLuteal = clampInt(lutealLength, 9, 18);
 
     final sorted = <DateTime>[];
     for (final day in periodDays.map(dayOnly).toSet()) {
@@ -235,47 +90,21 @@ abstract final class CycleEngine {
         today: now,
         cycleLength: clampInt(defaultCycleLength, minValidCycle, maxValidCycle),
         periodLength: clampInt(defaultPeriodLength, 1, 10),
-        lutealLength: luteal,
+        lutealLength: profileLuteal,
       );
     }
 
-    // ۱) گروه‌بندی روزهای خونریزی به دوره‌های پریود
-    final periods = <PeriodRange>[];
-    var rangeStart = sorted.first;
-    var rangeEnd = sorted.first;
-    for (var i = 1; i < sorted.length; i++) {
-      final day = sorted[i];
-      if (daysBetween(rangeEnd, day) <= maxGapInsidePeriod + 1) {
-        rangeEnd = day;
-      } else {
-        periods.add(PeriodRange(rangeStart, rangeEnd));
-        rangeStart = day;
-        rangeEnd = day;
-      }
-    }
-    periods.add(PeriodRange(rangeStart, rangeEnd));
-
-    // ۲) طول چرخه‌ها
-    final cycles = <CycleRecord>[];
-    for (var i = 0; i + 1 < periods.length; i++) {
-      final length = daysBetween(periods[i].start, periods[i + 1].start);
-      cycles.add(
-        CycleRecord(
-          start: periods[i].start,
-          length: length,
-          periodLength: periods[i].length,
-          valid: length >= minValidCycle && length <= maxValidCycle,
-        ),
-      );
-    }
-
-    final validLengths = <int>[
+    // ۱–۲) دوره‌های پریود و چرخه‌ها (چرخه‌ی «غیرعادی» از میانگین کنار می‌ره)
+    final periods = PeriodDetection.group(sorted);
+    final cycles = PeriodDetection.cyclesOf(periods, <int>{
+      for (final d in unusualCycleStarts) epochDay(d),
+    });
+    final recent = CycleStats.lastN(<int>[
       for (final cycle in cycles)
-        if (cycle.valid) cycle.length,
-    ];
-    final recent = _lastN(validLengths, historyWindow);
+        if (cycle.counted) cycle.length,
+    ], historyWindow);
     final avgCycle = clampInt(
-      _blend(recent, defaultCycleLength),
+      CycleStats.blend(recent, defaultCycleLength),
       minValidCycle,
       maxValidCycle,
     );
@@ -288,88 +117,89 @@ abstract final class CycleEngine {
         if (i < periods.length - 1 || !lastOngoing) periods[i].length,
     ];
     final avgPeriod = clampInt(
-      _blend(_lastN(completedPeriodLengths, historyWindow), defaultPeriodLength),
+      CycleStats.blend(
+        CycleStats.lastN(completedPeriodLengths, historyWindow),
+        defaultPeriodLength,
+      ),
       1,
       10,
     );
 
-    // فاصله‌ی روز تخمک‌گذاری از شروع چرخه (۰ = روز اول)
-    int ovulationOffset(int cycleLength) =>
-        clampInt(cycleLength - luteal - 1, 4, cycleLength - 2);
+    // ۴) تأیید تخمک‌گذاری با دما + فاز لوتئال شخصی
+    final readings = BbtAnalyzer.normalize(temperatures);
+    final learning = LutealLearning.learn(
+      periods: periods,
+      cycles: cycles,
+      readings: readings,
+      now: now,
+      profileLuteal: profileLuteal,
+    );
+    final currentBbt = learning.ovulationFor(last.start);
 
-    // ۴) نشانه‌گذاری روزها
-    final periodSet = <int>{for (final day in sorted) epochDay(day)};
-    final predictedSet = <int>{};
-    final fertileSet = <int>{};
-    final ovulationSet = <int>{};
-
-    void markFertility(DateTime cycleStart, int cycleLength) {
-      final ovulation = addDays(cycleStart, ovulationOffset(cycleLength));
-      ovulationSet.add(epochDay(ovulation));
-      for (var i = -5; i <= 1; i++) {
-        fertileSet.add(epochDay(addDays(ovulation, i)));
-      }
-    }
-
+    // ۵) نشانه‌گذاری روزها (چرخه‌های گذشته)
+    final marks = DayMarks(
+      luteal: learning.luteal,
+      period: <int>{for (final day in sorted) epochDay(day)},
+    );
     for (final cycle in cycles) {
-      if (cycle.valid) markFertility(cycle.start, cycle.length);
-    }
-    markFertility(last.start, avgCycle);
-
-    // ۵) پیش‌بینی
-    final expectedNext = addDays(last.start, avgCycle);
-    final daysUntil = daysBetween(now, expectedNext);
-
-    // اگه پریود عقب افتاده باشه، «هر لحظه ممکنه شروع بشه» → از امروز
-    final effectiveNext = daysUntil < 0 ? now : expectedNext;
-
-    final upcoming = <DateTime>[];
-    for (var k = 0; k < _futureCycles; k++) {
-      final start = addDays(effectiveNext, k * avgCycle);
-      upcoming.add(start);
-      for (var i = 0; i < avgPeriod; i++) {
-        predictedSet.add(epochDay(addDays(start, i)));
+      if (!cycle.valid) continue;
+      final confirmed = learning.ovulationFor(cycle.start);
+      if (confirmed != null) {
+        marks.markAround(confirmed.ovulationDate);
+      } else {
+        marks.markFertility(cycle.start, cycle.length);
       }
-      markFertility(start, avgCycle);
     }
-
-    final currentOvulation = addDays(last.start, ovulationOffset(avgCycle));
-    final nextOvulation = currentOvulation.isBefore(now)
-        ? addDays(effectiveNext, ovulationOffset(avgCycle))
-        : currentOvulation;
-
-    // ۶) وضعیت امروز
-    final cycleDay = daysBetween(last.start, now) + 1;
-    final ovulationDay = ovulationOffset(avgCycle) + 1;
-    final isPeriodToday = periodSet.contains(epochDay(now));
-    final bleedingNow =
-        isPeriodToday || (lastOngoing && cycleDay <= avgPeriod);
-
-    CyclePhase phase;
-    if (bleedingNow) {
-      phase = CyclePhase.menstrual;
-    } else if (cycleDay < ovulationDay - 1) {
-      phase = CyclePhase.follicular;
-    } else if (cycleDay <= ovulationDay + 1) {
-      phase = CyclePhase.ovulation;
+    if (currentBbt != null) {
+      marks.markAround(currentBbt.ovulationDate);
     } else {
-      phase = CyclePhase.luteal;
+      marks.markFertility(last.start, avgCycle);
     }
 
-    // ۷) نظم چرخه
+    // ۶) پیش‌بینی چرخه‌های آینده
+    final forecast = CycleForecast.build(
+      last: last,
+      now: now,
+      avgCycle: avgCycle,
+      avgPeriod: avgPeriod,
+      luteal: learning.luteal,
+      currentBbt: currentBbt,
+      marks: marks,
+    );
+
+    // ۷) وضعیت امروز
+    final cycleDay = daysBetween(last.start, now) + 1;
+    final ovulationDay = currentBbt != null
+        ? daysBetween(last.start, currentBbt.ovulationDate) + 1
+        : DayMarks.ovulationOffset(avgCycle, learning.luteal) + 1;
+    final isPeriodToday = marks.period.contains(epochDay(now));
+    final bleedingNow = isPeriodToday || (lastOngoing && cycleDay <= avgPeriod);
+
+    // ۸) نظم چرخه، بازه‌ی پیش‌بینی و اطمینان
     int? minCycle;
     int? maxCycle;
     for (final length in recent) {
       if (minCycle == null || length < minCycle) minCycle = length;
       if (maxCycle == null || length > maxCycle) maxCycle = length;
     }
-    var regularity = CycleRegularity.unknown;
-    if (recent.length >= 2 && minCycle != null && maxCycle != null) {
-      regularity = (maxCycle - minCycle) <= regularSpread
-          ? CycleRegularity.regular
-          : CycleRegularity.irregular;
+    final regularity = CycleStats.regularityOf(
+      minCycle,
+      maxCycle,
+      recent.length,
+    );
+
+    // وقتی تخمک‌گذاری تأیید شده، بازه‌ی عدم‌قطعیت فقط به تغییرات فاز لوتئال
+    // (معمولاً ±۲ روز) برمی‌گرده
+    var spread = CycleStats.spreadOf(recent);
+    var confidence = CycleStats.confidenceOf(recent, spread);
+    if (forecast.bbtRefined) {
+      spread = math.min(spread, bbtRefinedMaxSpread);
+      if (confidence == PredictionConfidence.low) {
+        confidence = PredictionConfidence.medium;
+      }
     }
 
+    final nextOvulation = forecast.nextOvulation;
     return CycleSnapshot(
       today: now,
       hasData: true,
@@ -378,40 +208,50 @@ abstract final class CycleEngine {
       recentCycleLengths: recent,
       avgCycleLength: avgCycle,
       avgPeriodLength: avgPeriod,
-      lutealLength: luteal,
+      lutealLength: learning.luteal,
+      lutealSource: learning.learned
+          ? LutealSource.learned
+          : LutealSource.profile,
+      lutealSamples: learning.samples,
+      bbtOvulations: learning.ovulations,
+      bbtRefined: forecast.bbtRefined,
+      bbtReadingsThisCycle: BbtAnalyzer.countReadings(
+        readings,
+        last.start,
+        addDays(now, 1),
+      ),
+      unusualCycleCount: cycles.where((c) => c.excluded).length,
       minCycleLength: minCycle,
       maxCycleLength: maxCycle,
       regularity: regularity,
       lastPeriodStart: last.start,
-      nextPeriodStart: expectedNext,
-      daysUntilNextPeriod: daysUntil,
+      nextPeriodStart: forecast.expectedNext,
+      predictionSpread: spread,
+      confidence: confidence,
+      concerns: CycleStats.concernsOf(
+        cycles: cycles,
+        recent: recent,
+        avgCycle: avgCycle,
+        regularity: regularity,
+        cycleDay: cycleDay,
+      ),
+      daysUntilNextPeriod: forecast.daysUntil,
       cycleDay: cycleDay,
-      phase: phase,
+      phase: CyclePhaseResolver.resolve(
+        bleedingNow: bleedingNow,
+        cycleDay: cycleDay,
+        ovulationDay: ovulationDay,
+      ),
       isPeriodToday: isPeriodToday,
       isPeriodOngoing: bleedingNow,
       nextOvulation: nextOvulation,
       fertileStart: addDays(nextOvulation, -5),
       fertileEnd: addDays(nextOvulation, 1),
-      upcomingPeriods: upcoming,
-      periodDaySet: periodSet,
-      predictedDaySet: predictedSet,
-      fertileDaySet: fertileSet,
-      ovulationDaySet: ovulationSet,
+      upcomingPeriods: forecast.upcoming,
+      periodDaySet: marks.period,
+      predictedDaySet: marks.predicted,
+      fertileDaySet: marks.fertile,
+      ovulationDaySet: marks.ovulation,
     );
-  }
-
-  static List<int> _lastN(List<int> values, int count) =>
-      values.length > count ? values.sublist(values.length - count) : values;
-
-  /// میانگین مقادیر واقعی؛ تا وقتی کمتر از ۳ نمونه داریم، با مقدار
-  /// پیش‌فرضِ کاربر ترکیب می‌شه تا یک چرخه‌ی غیرعادی پیش‌بینی رو خراب نکنه.
-  static int _blend(List<int> values, int fallback) {
-    if (values.isEmpty) return fallback;
-    var sum = 0;
-    for (final value in values) {
-      sum += value;
-    }
-    if (values.length >= 3) return (sum / values.length).round();
-    return ((sum + fallback * (3 - values.length)) / 3).round();
   }
 }
