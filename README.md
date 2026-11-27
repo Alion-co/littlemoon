@@ -88,15 +88,20 @@ lib/
 
 </details>
 
-## مجوز
+</div>
 
-Little Moon برای هر کاری که **غیرتجاری** باشه آزاده، با مجوز [PolyForm Noncommercial 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0) (جزئیات در فایل [`LICENSE`](LICENSE))
+<p align="center">
+  <a href="LICENSE"><img src="docs/readme/license.png" width="830" alt="مجوز · License: استفاده، مطالعه و تغییر آزاد است؛ فروش و هر نوع استفاده‌ی تجاری ممنوع است · PolyForm Noncommercial 1.0.0"></a>
+</p>
+
+<div dir="rtl" align="center">
+
 فونت وزیرمتن جداگانه با مجوز SIL Open Font License 1.1 منتشر شده
 
 </div>
 
 <p align="center">
-  <a href="https://instagram.com/alion.inc"><img src="docs/readme/credit.png" width="360" alt="Designed by ALION · Instagram"></a>
+  <a href="https://instagram.com/alion.inc"><img src="docs/readme/credit.png" width="560" alt="Designed by ALION · Instagram"></a>
 </p>
 
 <details>
@@ -104,6 +109,6 @@ Little Moon برای هر کاری که **غیرتجاری** باشه آزاده
 
 **Little Moon** is a private, free and fully offline monthly cycle tracker. It predicts your next period, ovulation and fertile window from what you log, and keeps everything on your phone: no account, no server, no ads. Five languages with full right-to-left support, Shamsi and Gregorian calendars, eight themes, PIN and fingerprint lock, backup files and a PDF report for your doctor.
 
-Download from [Cafe Bazaar](https://cafebazaar.ir/app/ir.littlemoon), [Myket](https://myket.ir/app/ir.littlemoon) or the [latest release](https://github.com/Alion-co/littlemoon/releases/latest). Free for noncommercial use under the PolyForm Noncommercial License 1.0.0. Estimates only: not a medical device and not a method of contraception.
+Download from [Cafe Bazaar](https://cafebazaar.ir/app/ir.littlemoon), [Myket](https://myket.ir/app/ir.littlemoon) or the [latest release](https://github.com/Alion-co/littlemoon/releases/latest). Free for noncommercial use under the PolyForm Noncommercial License 1.0.0; commercial use and resale are not permitted. Estimates only: not a medical device and not a method of contraception.
 
 </details>
