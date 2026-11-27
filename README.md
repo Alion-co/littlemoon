@@ -101,7 +101,7 @@ lib/
 </div>
 
 <p align="center">
-  <a href="https://instagram.com/alion.inc"><img src="docs/readme/credit.png" width="520" alt="Designed by Alion · Instagram"></a>
+  <a href="https://instagram.com/alion.inc"><img src="docs/readme/credit.png" width="640" alt="Designed by Alion · Instagram"></a>
 </p>
 
 <details>
