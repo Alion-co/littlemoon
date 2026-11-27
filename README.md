@@ -28,12 +28,11 @@ Little Moon پریود بعدی، تخمک‌گذاری و روزهای بارو
 </div>
 
 <p align="center">
-  <img src="docs/screenshots/home.jpg" width="135" alt="خانه">
-  <img src="docs/screenshots/calendar.jpg" width="135" alt="تقویم">
-  <img src="docs/screenshots/insights.jpg" width="135" alt="تحلیل">
-  <img src="docs/screenshots/health.jpg" width="135" alt="سلامت">
-  <img src="docs/screenshots/profile.jpg" width="135" alt="پروفایل">
-  <img src="docs/screenshots/settings.jpg" width="135" alt="تنظیمات">
+  <img src="docs/screenshots/home.jpg" width="150" alt="خانه">
+  <img src="docs/screenshots/calendar.jpg" width="150" alt="تقویم">
+  <img src="docs/screenshots/insights.jpg" width="150" alt="تحلیل">
+  <img src="docs/screenshots/health.jpg" width="150" alt="سلامت">
+  <img src="docs/screenshots/profile.jpg" width="150" alt="پروفایل">
 </p>
 
 <div dir="rtl">
@@ -103,7 +102,7 @@ Little Moon برای هر کاری که **غیرتجاری** باشه آزاده
 </div>
 
 <p align="center">
-  <a href="https://instagram.com/alion.inc"><img src="docs/readme/credit.png" width="300" alt="طراحی و ساخت: Alion"></a>
+  <a href="https://instagram.com/alion.inc"><img src="docs/readme/credit.png" width="360" alt="طراحی و ساخت: ALION"></a>
 </p>
 
 <details>
